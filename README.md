@@ -8,99 +8,43 @@ The documentation for Vaadin Portlet support is available [here](https://github.
 ## Running the portlet
 
 Before the portlet application can be run, it must be deployed to a portal. 
-We currently support Apache Pluto (https://portals.apache.org/pluto/). The
-easiest way to try out your application is to run a Maven goal which starts an 
-embedded Tomcat 8 serving the Pluto Portal driver:
+We currently support [Apache Pluto](https://portals.apache.org/pluto/). The
+easiest way to try out your application is to run a Maven goal which downloads 
+and starts an embedded Tomcat 8 serving the Pluto Portal driver:
 
-`mvn package cargo:run -Pdemo,production`
+`mvn package cargo:run -Pautosetup,production`
 
 Visit http://localhost:8080/pluto, and log in as `pluto`, password `pluto`.
 
-The deployed portlet needs to be added to portal page. Do this by
+The deployed portlet needs to be added to a portal page. Do this by
 1) Selecting `Pluto Admin` page
 2) Select `About Apache Pluto` from the drop-down under "Portal Pages"
-3) Select `/portlet-starter` from the left drop-down under "Portlet Applications"
-4) Select `MyPortlet1` from the drop-down on the right
+3) Select `/portlet-address-book` from the left drop-down under "Portlet Applications"
+4) Select `Grid` from the drop-down on the right
 5) Click the `Add Portlet` button
+6) Repeat steps 2-5 for the `Form` portlet
 
-Once you navigate to `About Apache Pluto` page, the starter portlet should be
-visible on the page, displaying a "Click me" button. 
+Once you navigate to `About Apache Pluto` page, the `Grid` and the `Form` portlets should be
+visible on the page.
+
+For the consecutive runs, use the following command to reuse the already downloaded Tomcat and Pluto:
+
+`mvn package cargo:run -Pautocopy,production`
 
 ## Remote debugging for Portal
 
 Remote debugging (JDWP) is available on port 8000 (to activate
 in IntelliJ, choose `Run -> Attach to Process...`). 
 
-## Integration tests
-To run the integration tests:
-
-`mvn clean verify -Pdemo,production,integration-tests` 
-
 ## Production build
-Before deploying your portlet for production for the first time, you will
-probably want to change `portlet-name` in `portal.xml` from `TestPortlet1` to
-something else, as well as the tag returned by `MyPortlet.PORTLET_TAG` from
-`portlet-content` to something else (stock Pluto already contains portlets with
-these names). Then build the production .war:
+To build the production .war run:
 
 `mvn package -Pproduction`
 
-Copy both `portlet-starter.war` and `vaadin-portlet-static.war` from `/target`
-folder into the `webapps` folder on a Tomcat web server with Pluto. Restart
-the web server. To add the portlet to a page, use Pluto's "Pluto Admin" 
-interface as detailed in "Running the portlet".
-
-## Portlet development in servlet mode
-
-It is possible to develop portlets as normal single route Vaadin applications.
-
-[NOTE] when developing using servlet mode no Portlet specific methods can be used
-in the view for servlet mode. 
-
-To develop portlets in servlet mode using jetty create a Route for portlet content e.g.
-
-```java
-package com.vaadin.starter.portlet;
-
-import com.vaadin.flow.router.Route;
-
-@Route("")
-public class ServletDevelopment extends MyPortletContent {
-}
-```
-
-Then run the project as `mvn clean jetty:run -Pservlet`
-
-### Creating a Portlet with servlet mode
-
-To create an application that can be used both as a portlet and a servlet application
-you need to check at generation time the `Request` type.
-
-For instance `MyPortletContent` could be setup as
-
-```java
-public class MyPortletContent extends VerticalLayout {
-    public MyPortletContent() {
-        String message;
-        if (VaadinRequest.getCurrent() instanceof PortletRequest) {
-            VaadinPortlet portlet = VaadinPortlet.getCurrent();
-            String name = portlet.getPortletName();
-            String serverInfo = portlet.getPortletContext().getServerInfo();
-            message = String
-                    .format("Hello from %s running in %s!", name, serverInfo);
-        } else {
-            message = String
-                    .format("Hello from %s running in a servlet container",
-                            getClass().getSimpleName());
-        }
-        Button button = new Button("Click me",
-                event -> Notification.show(message));
-        add(button);
-    }
-}
-```
+Deploy both `portlet-address-book.war` and `vaadin-portlet-static.war` from `/target`
+folder to your web server / portal. 
 
 ## Notes about the project
 
 Vaadin 14+ portlet support feature is still under development and changes to
-both the API and this starter project are possible.
+both the API and this project are possible.
