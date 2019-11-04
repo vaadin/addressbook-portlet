@@ -21,7 +21,7 @@
 
         <vaadin.version>14.1.0.alpha5</vaadin.version>
         <flow.version>2.2.0.alpha2</flow.version>
-        <vaadin-portlet.version>1.0-SNAPSHOT</vaadin-portlet.version>
+        <vaadin-portlet.version>1.0.0.alpha3</vaadin-portlet.version>
         <vaadin.productionMode>true</vaadin.productionMode>
 
         <pluto.version>3.1.0</pluto.version>
