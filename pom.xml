@@ -11,20 +11,20 @@
     <packaging>war</packaging>
 
     <properties>
-        <javax.validation.version>2.0.0.Final</javax.validation.version>
-
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-        <vaadin.productionMode>true</vaadin.productionMode>
+        <project.reporting.outputEncoding>UTF-8
+        </project.reporting.outputEncoding>
+        <failOnMissingWebXml>false</failOnMissingWebXml>
+        <javax.validation.version>2.0.0.Final</javax.validation.version>
 
         <vaadin.version>14.1.0.alpha5</vaadin.version>
         <flow.version>2.2.0.alpha2</flow.version>
         <vaadin-portlet.version>1.0-SNAPSHOT</vaadin-portlet.version>
+        <vaadin.productionMode>true</vaadin.productionMode>
 
-        <failOnMissingWebXml>false</failOnMissingWebXml>
+        <pluto.version>3.1.0</pluto.version>
     </properties>
 
     <repositories>
@@ -34,7 +34,9 @@
         </repository>
         <repository>
             <id>vaadin-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
+            <url>
+                https://oss.sonatype.org/content/repositories/vaadin-snapshots/
+            </url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
@@ -52,7 +54,9 @@
         </pluginRepository>
         <pluginRepository>
             <id>vaadin-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
+            <url>
+                https://oss.sonatype.org/content/repositories/vaadin-snapshots/
+            </url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
@@ -162,6 +166,35 @@
 
     <build>
         <finalName>${project.artifactId}</finalName>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.cargo</groupId>
+                    <artifactId>cargo-maven2-plugin</artifactId>
+                    <version>1.7.7</version>
+                    <configuration>
+                        <container>
+                            <containerId>tomcat8x</containerId>
+                        </container>
+                        <configuration>
+                            <type>existing</type>
+                            <home>
+                                ${project.build.directory}/pluto-${pluto.version}
+                            </home>
+
+                            <properties>
+                                <cargo.start.jvmargs>
+                                    -Xdebug
+                                    -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000
+                                    -Xnoagent
+                                    -Djava.compiler=NONE
+                                </cargo.start.jvmargs>
+                            </properties>
+                        </configuration>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -188,8 +221,10 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Implementation-Title>${project.name}</Implementation-Title>
-                            <Implementation-Version>${project.version}</Implementation-Version>
+                            <Implementation-Title>${project.name}
+                            </Implementation-Title>
+                            <Implementation-Version>${project.version}
+                            </Implementation-Version>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -201,12 +236,15 @@
                         </goals>
                         <configuration>
                             <warName>vaadin-portlet-static</warName>
-                            <packagingIncludes>WEB-INF/lib/flow-client*.jar,VAADIN/</packagingIncludes>
+                            <packagingIncludes>
+                                WEB-INF/lib/flow-client*.jar,VAADIN/
+                            </packagingIncludes>
 
                             <webResources>
                                 <resource>
                                     <!-- this is relative to the pom.xml directory -->
-                                    <directory>target/classes/META-INF/</directory>
+                                    <directory>target/classes/META-INF/
+                                    </directory>
                                     <includes>
                                         <include>**</include>
                                     </includes>
@@ -226,13 +264,13 @@
                         </goals>
                         <configuration>
                             <primaryArtifact>true</primaryArtifact>
-                            <packagingExcludes>WEB-INF/classes/META-INF/VAADIN/build/**,VAADIN/</packagingExcludes>
+                            <packagingExcludes>
+                                WEB-INF/classes/META-INF/VAADIN/build/**,VAADIN/
+                            </packagingExcludes>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
-
         </plugins>
     </build>
 
@@ -264,12 +302,9 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>demo</id>
 
-            <properties>
-                <pluto.version>3.1.0</pluto.version>
-            </properties>
+        <profile>
+            <id>autosetup</id>
 
             <build>
                 <plugins>
@@ -279,7 +314,7 @@
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>download-files</id>
+                                <id>download-and-copy-files</id>
                                 <phase>package</phase>
                                 <goals>
                                     <goal>run</goal>
@@ -287,7 +322,8 @@
                                 <configuration>
                                     <tasks>
                                         <get src="ftp://ftp.funet.fi/pub/mirrors/apache.org/portals/pluto/pluto-bundle-${pluto.version}.zip"
-                                             dest="${project.build.directory}/pluto.zip" verbose="false"
+                                             dest="${project.build.directory}/pluto.zip"
+                                             verbose="false"
                                              usetimestamp="true"/>
                                         <unzip src="${project.build.directory}/pluto.zip"
                                                dest="${project.build.directory}"/>
@@ -303,25 +339,41 @@
                     <plugin>
                         <groupId>org.codehaus.cargo</groupId>
                         <artifactId>cargo-maven2-plugin</artifactId>
-                        <version>1.7.7</version>
-                        <configuration>
-                            <container>
-                                <containerId>tomcat8x</containerId>
-                            </container>
-                            <configuration>
-                                <type>existing</type>
-                                <home>${project.build.directory}/pluto-${pluto.version}</home>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
-                                <properties>
-                                    <cargo.start.jvmargs>
-                                        -Xdebug
-                                        -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000
-                                        -Xnoagent
-                                        -Djava.compiler=NONE
-                                    </cargo.start.jvmargs>
-                                </properties>
-                            </configuration>
-                        </configuration>
+        <profile>
+            <id>autocopy</id>
+
+            <build>
+                <plugins>
+                    <!-- setup Pluto and copy portlet -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-files</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <copy file="${project.build.directory}/${project.artifactId}.war"
+                                              todir="${project.build.directory}/pluto-${pluto.version}/webapps"/>
+                                        <copy file="${project.build.directory}/vaadin-portlet-static.war"
+                                              todir="${project.build.directory}/pluto-${pluto.version}/webapps"/>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-maven2-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>
@@ -357,34 +409,10 @@
                             <scanIntervalSeconds>2</scanIntervalSeconds>
                             <!-- Use war output directory to get the webpack files -->
                             <webAppConfig>
-                                <allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
+                                <allowDuplicateFragmentNames>true
+                                </allowDuplicateFragmentNames>
                             </webAppConfig>
                         </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>autosetup</id>
-            <build>
-
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>autocopy</id>
-            <build>
-
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>

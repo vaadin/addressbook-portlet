@@ -9,10 +9,10 @@ The documentation for Vaadin Portlet support is available [here](https://github.
 
 Before the portlet application can be run, it must be deployed to a portal. 
 We currently support [Apache Pluto](https://portals.apache.org/pluto/). The
-easiest way to try out your application is to run a Maven goal which starts an 
-embedded Tomcat 8 serving the Pluto Portal driver:
+easiest way to try out your application is to run a Maven goal which downloads 
+and starts an embedded Tomcat 8 serving the Pluto Portal driver:
 
-`mvn package cargo:run -Pdemo,production`
+`mvn package cargo:run -Pautosetup,production`
 
 Visit http://localhost:8080/pluto, and log in as `pluto`, password `pluto`.
 
@@ -25,7 +25,11 @@ The deployed portlet needs to be added to a portal page. Do this by
 6) Repeat steps 2-5 for the `Form` portlet
 
 Once you navigate to `About Apache Pluto` page, the `Grid` and the `Form` portlets should be
-visible on the page. 
+visible on the page.
+
+For the consecutive runs, use the following command to reuse the already downloaded Tomcat and Pluto:
+
+`mvn package cargo:run -Pautocopy,production`
 
 ## Remote debugging for Portal
 
