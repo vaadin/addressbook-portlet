@@ -41,10 +41,8 @@ To build the production .war run:
 
 `mvn package -Pproduction`
 
-Copy both `portlet-address-book.war` and `vaadin-portlet-static.war` from `/target`
-folder into the `webapps` folder on a Tomcat web server with Pluto. Restart
-the web server. To add the portlet to a page, use Pluto's "Pluto Admin" 
-interface as detailed in "Running the portlet".
+Deploy both `portlet-address-book.war` and `vaadin-portlet-static.war` from `/target`
+folder to your web server / portal. 
 
 ## Notes about the project
 
