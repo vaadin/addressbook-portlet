@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2018 Vaadin Ltd.
+ * Copyright 2000-2019 Vaadin Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,59 +15,93 @@
  */
 package com.vaadin.flow.portal.addressbook.grid;
 
-import java.util.Optional;
+import javax.portlet.WindowState;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.vaadin.flow.component.ClientCallable;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.ItemClickEvent;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.portal.addressbook.backend.Contact;
 import com.vaadin.flow.portal.addressbook.backend.ContactService;
-import com.vaadin.flow.portal.addressbook.form.FormPortlet;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.portal.handler.PortletView;
+import com.vaadin.flow.portal.handler.PortletViewContext;
 
 /**
  * @author Vaadin Ltd
- *
  */
-public class GridView extends Grid<Contact> {
+public class GridView extends VerticalLayout implements PortletView {
 
+    public static final String SELECTION = "selection";
     private ListDataProvider<Contact> dataProvider;
 
-    public GridView() {
-        super(Contact.class);
-        dataProvider = new ListDataProvider<>(
-                ContactService.getDemoService().findAll(""));
-        setDataProvider(dataProvider);
-        removeColumnByKey("id");
-        setSelectionMode(SelectionMode.NONE);
-        addItemClickListener(this::notifyForm);
-        setWidth("300px");
-        setColumns("firstName", "lastName", "phoneNumber", "email",
-                "birthDate");
+    private Grid<Contact> grid = new Grid<>(Contact.class);
+    private Button windowStateButton;
+
+    private PortletViewContext portletViewContext;
+
+    @Override
+    public void onPortletViewContextInit(PortletViewContext context) {
+        portletViewContext = context;
+        context.addWindowStateChangeListener(
+                event -> handleWindowStateChanged(event.getWindowState()));
+        init();
     }
 
-    @ClientCallable
-    private void refresh(int id) {
-        Optional<Contact> contact = dataProvider.getItems().stream()
-                .filter(item -> item.getId().equals(id)).findFirst();
-        if (contact.isPresent()) {
-            Contact newContact = ContactService.getDemoService().findById(id)
-                    .get();
-            contact.get().setFirstName(newContact.getFirstName());
-            contact.get().setLastName(newContact.getLastName());
-            contact.get().setEmail(newContact.getEmail());
-            contact.get().setPhoneNumber(newContact.getPhoneNumber());
-            contact.get().setBirthDate(newContact.getBirthDate());
-            dataProvider.refreshItem(contact.get());
+    private void handleWindowStateChanged(WindowState windowState) {
+        if (WindowState.MAXIMIZED.equals(windowState)) {
+            this.windowStateButton.setText("Normalize");
+            grid.setColumns("firstName", "lastName", "phoneNumber", "email",
+                    "birthDate");
+            grid.setMinWidth("700px");
+        } else if (WindowState.NORMAL.equals(windowState)) {
+            this.windowStateButton.setText("Maximize");
+            grid.setColumns("firstName", "lastName", "phoneNumber");
+            grid.setMinWidth("450px");
         }
     }
 
-    private void notifyForm(ItemClickEvent<Contact> event) {
-        getUI().get().getPage().executeJs(
-                "var form = document.querySelector($0).firstChild;"
-                        + "form.$server.show($1);",
-                FormPortlet.TAG, event.getItem().getId());
+    private void init() {
+        setWidthFull();
+
+        dataProvider = new ListDataProvider<>(
+                ContactService.getInstance().getContacts());
+
+        grid.setDataProvider(dataProvider);
+        grid.removeColumnByKey("id");
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        grid.addItemClickListener(this::fireSelectionEvent);
+
+        windowStateButton = new Button();
+        windowStateButton.addClickListener(event -> switchWindowState());
+
+        handleWindowStateChanged(getWindowState());
+
+        add(windowStateButton, grid);
+        setHorizontalComponentAlignment(Alignment.END, windowStateButton);
     }
 
+    private void fireSelectionEvent(
+            ItemClickEvent<Contact> contactItemClickEvent) {
+        Integer contactId = contactItemClickEvent.getItem().getId();
+
+        Map<String, String> param = new HashMap<>();
+        param.put("contactId", Integer.toString(contactId));
+
+        portletViewContext.fireEvent("contact-selected", param);
+    }
+
+    private void switchWindowState() {
+        if (WindowState.NORMAL.equals(getWindowState())) {
+            portletViewContext.setWindowState(WindowState.MAXIMIZED);
+        } else if (WindowState.MAXIMIZED.equals(getWindowState())) {
+            portletViewContext.setWindowState(WindowState.NORMAL);
+        }
+    }
+
+    private WindowState getWindowState() {
+        return portletViewContext.getWindowState();
+    }
 }
