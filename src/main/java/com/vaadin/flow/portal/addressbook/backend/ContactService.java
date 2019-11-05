@@ -37,7 +37,7 @@ import elemental.json.JsonObject;
 
 public class ContactService {
     private static Map<Integer, Contact> contacts = new HashMap<>();
-    private static ContactService service;
+    private static final ContactService INSTANCE = new ContactService();
 
     private ContactService() {
         if (contacts.isEmpty()) {
@@ -70,10 +70,7 @@ public class ContactService {
     }
 
     public static ContactService getInstance() {
-        if (service == null) {
-            service = new ContactService();
-        }
-        return service;
+        return INSTANCE;
     }
 
     public Collection<Contact> getContacts() {

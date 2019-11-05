@@ -16,7 +16,6 @@
 package com.vaadin.flow.portal.addressbook.form;
 
 import javax.portlet.PortletMode;
-import javax.portlet.WindowState;
 import java.util.Optional;
 
 import com.vaadin.flow.component.button.Button;
@@ -33,7 +32,6 @@ import com.vaadin.flow.portal.handler.PortletEvent;
 import com.vaadin.flow.portal.handler.PortletModeEvent;
 import com.vaadin.flow.portal.handler.PortletView;
 import com.vaadin.flow.portal.handler.PortletViewContext;
-import com.vaadin.flow.portal.handler.WindowStateEvent;
 
 /**
  * @author Vaadin Ltd
@@ -48,7 +46,6 @@ public class FormView extends VerticalLayout implements PortletView {
     private Binder<Contact> binder;
     private Button action;
     private Button cancel;
-    private Button windowState;
     private TextField firstName;
     private Image image;
 
@@ -59,7 +56,6 @@ public class FormView extends VerticalLayout implements PortletView {
         this.portletViewContext = context;
         context.addEventChangeListener("contact-selected", this::handleEvent);
         context.addPortletModeChangeListener(this::handlePortletModeChange);
-        context.addWindowStateChangeListener(this::handleWindowStateChange);
         init();
     }
 
@@ -68,17 +64,12 @@ public class FormView extends VerticalLayout implements PortletView {
         setupButtons();
 
         HorizontalLayout actionButtons = new HorizontalLayout(action, cancel);
-        add(windowState, formLayout, actionButtons);
-        setHorizontalComponentAlignment(Alignment.END, windowState,
-                actionButtons);
+        add(formLayout, actionButtons);
+        setHorizontalComponentAlignment(Alignment.END, actionButtons);
     }
 
     private PortletMode getPortletMode() {
         return portletViewContext.getPortletMode();
-    }
-
-    private WindowState getWindowState() {
-        return portletViewContext.getWindowState();
     }
 
     private FormLayout populateFormLayout() {
@@ -123,19 +114,6 @@ public class FormView extends VerticalLayout implements PortletView {
                 });
 
         cancel = new Button("Cancel", event -> cancel());
-
-        windowState = new Button(
-                WindowState.NORMAL.equals(getWindowState()) ? WINDOW_MAXIMIZE
-                        : WINDOW_NORMALIZE,
-                event -> switchWindowState());
-    }
-
-    private void switchWindowState() {
-        if (WindowState.NORMAL.equals(getWindowState())) {
-            portletViewContext.setWindowState(WindowState.MAXIMIZED);
-        } else if (WindowState.MAXIMIZED.equals(getWindowState())) {
-            portletViewContext.setWindowState(WindowState.NORMAL);
-        }
     }
 
     private void handleEvent(PortletEvent event) {
@@ -165,14 +143,6 @@ public class FormView extends VerticalLayout implements PortletView {
         }
 
         portletViewContext.setPortletMode(PortletMode.VIEW);
-    }
-
-    private void handleWindowStateChange(WindowStateEvent event) {
-        if (WindowState.MAXIMIZED.equals(event.getWindowState())) {
-            windowState.setText(WINDOW_NORMALIZE);
-        } else if (WindowState.NORMAL.equals(event.getWindowState())) {
-            windowState.setText(WINDOW_MAXIMIZE);
-        }
     }
 
     private void handlePortletModeChange(PortletModeEvent event) {
