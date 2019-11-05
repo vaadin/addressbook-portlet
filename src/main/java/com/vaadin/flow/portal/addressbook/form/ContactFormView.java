@@ -16,6 +16,8 @@
 package com.vaadin.flow.portal.addressbook.form;
 
 import javax.portlet.PortletMode;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import com.vaadin.flow.component.button.Button;
@@ -36,7 +38,7 @@ import com.vaadin.flow.portal.handler.PortletViewContext;
 /**
  * @author Vaadin Ltd
  */
-public class FormView extends VerticalLayout implements PortletView {
+public class ContactFormView extends VerticalLayout implements PortletView {
 
     public static final String ACTION_EDIT = "Edit";
     public static final String ACTION_SAVE = "Save";
@@ -54,7 +56,8 @@ public class FormView extends VerticalLayout implements PortletView {
     @Override
     public void onPortletViewContextInit(PortletViewContext context) {
         this.portletViewContext = context;
-        context.addEventChangeListener("contact-selected", this::handleEvent);
+        context.addEventChangeListener("contact-selected",
+                this::onContactSelected);
         context.addPortletModeChangeListener(this::handlePortletModeChange);
         init();
     }
@@ -116,16 +119,14 @@ public class FormView extends VerticalLayout implements PortletView {
         cancel = new Button("Cancel", event -> cancel());
     }
 
-    private void handleEvent(PortletEvent event) {
-        Integer contactId = Integer
+    private void onContactSelected(PortletEvent event) {
+        int contactId = Integer
                 .parseInt(event.getParameters().get("contactId")[0]);
         Optional<Contact> contact = ContactService.getInstance()
                 .findById(contactId);
         if (contact.isPresent()) {
             binder.setBean(contact.get());
             image.setSrc(contact.get().getImage().toString());
-        } else {
-            cancel();
         }
     }
 
@@ -140,9 +141,17 @@ public class FormView extends VerticalLayout implements PortletView {
 
         if (contact != null) {
             ContactService.getInstance().save(contact);
+            fireUpdateEvent(contact);
         }
 
         portletViewContext.setPortletMode(PortletMode.VIEW);
+    }
+
+    private void fireUpdateEvent(Contact contact) {
+        Map<String, String> param = new HashMap<>();
+        param.put("contactId", contact.getId().toString());
+
+        portletViewContext.fireEvent("contact-updated", param);
     }
 
     private void handlePortletModeChange(PortletModeEvent event) {

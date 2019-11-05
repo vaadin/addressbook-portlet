@@ -20,5 +20,5 @@ import com.vaadin.flow.portal.VaadinPortlet;
 /**
  * @author Vaadin Ltd
  */
-public class FormPortlet extends VaadinPortlet<FormView> {
+public class ContactFormPortlet extends VaadinPortlet<ContactFormView> {
 }
