@@ -18,9 +18,7 @@ package com.vaadin.flow.portal.addressbook.grid;
 import javax.portlet.WindowState;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
-import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.ItemClickEvent;
@@ -28,53 +26,61 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.portal.addressbook.backend.Contact;
 import com.vaadin.flow.portal.addressbook.backend.ContactService;
-import com.vaadin.flow.portal.addressbook.form.FormPortlet;
 import com.vaadin.flow.portal.handler.PortletView;
 import com.vaadin.flow.portal.handler.PortletViewContext;
-import com.vaadin.flow.portal.internal.PortletHubUtil;
-import com.vaadin.flow.router.Route;
 
 /**
  * @author Vaadin Ltd
- *
  */
 public class GridView extends VerticalLayout implements PortletView {
 
     public static final String SELECTION = "selection";
     private ListDataProvider<Contact> dataProvider;
 
-    private Button windowState;
+    private Grid<Contact> grid = new Grid<>(Contact.class);
+    private Button windowStateButton;
 
     private PortletViewContext portletViewContext;
 
     @Override
     public void onPortletViewContextInit(PortletViewContext context) {
         portletViewContext = context;
+        context.addWindowStateChangeListener(
+                event -> handleWindowStateChanged(event.getWindowState()));
         init();
     }
 
-    public void init() {
+    private void handleWindowStateChanged(WindowState windowState) {
+        if (WindowState.MAXIMIZED.equals(windowState)) {
+            this.windowStateButton.setText("Normalize");
+            grid.setColumns("firstName", "lastName", "phoneNumber", "email",
+                    "birthDate");
+            grid.setMinWidth("700px");
+        } else if (WindowState.NORMAL.equals(windowState)) {
+            this.windowStateButton.setText("Maximize");
+            grid.setColumns("firstName", "lastName", "phoneNumber");
+            grid.setMinWidth("450px");
+        }
+    }
+
+    private void init() {
         setWidthFull();
 
         dataProvider = new ListDataProvider<>(
                 ContactService.getInstance().getContacts());
 
-        Grid<Contact> grid = new Grid<>(Contact.class);
         grid.setDataProvider(dataProvider);
         grid.removeColumnByKey("id");
-        grid.setSelectionMode(Grid.SelectionMode.NONE);
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         grid.addItemClickListener(this::fireSelectionEvent);
-        grid.setColumns("firstName", "lastName", "phoneNumber", "email",
-                "birthDate");
-        setMinWidth("450px");
 
-        windowState = new Button(
-                WindowState.NORMAL.equals(getWindowState()) ?
-                        "Maximize" :
-                        "Normalize", event -> switchWindowState());
+        windowStateButton = new Button();
+        windowStateButton.addClickListener(event -> switchWindowState());
 
-        add(windowState, grid);
-        setHorizontalComponentAlignment(Alignment.END, windowState);
+        handleWindowStateChanged(getWindowState());
+
+        add(windowStateButton, grid);
+        setHorizontalComponentAlignment(Alignment.END, windowStateButton);
     }
 
     private void fireSelectionEvent(
@@ -82,18 +88,16 @@ public class GridView extends VerticalLayout implements PortletView {
         Integer contactId = contactItemClickEvent.getItem().getId();
 
         Map<String, String> param = new HashMap<>();
-        param.put("selection", Integer.toString(contactId));
+        param.put("contactId", Integer.toString(contactId));
 
-        param.put("windowState", getWindowState().toString());
+        portletViewContext.fireEvent("contact-selected", param);
     }
 
     private void switchWindowState() {
         if (WindowState.NORMAL.equals(getWindowState())) {
             portletViewContext.setWindowState(WindowState.MAXIMIZED);
-            windowState.setText("Normalize");
         } else if (WindowState.MAXIMIZED.equals(getWindowState())) {
             portletViewContext.setWindowState(WindowState.NORMAL);
-            windowState.setText("Maximize");
         }
     }
 

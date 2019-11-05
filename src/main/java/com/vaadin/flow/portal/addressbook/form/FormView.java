@@ -33,12 +33,12 @@ import com.vaadin.flow.portal.handler.PortletEvent;
 import com.vaadin.flow.portal.handler.PortletModeEvent;
 import com.vaadin.flow.portal.handler.PortletView;
 import com.vaadin.flow.portal.handler.PortletViewContext;
+import com.vaadin.flow.portal.handler.WindowStateEvent;
 
 /**
  * @author Vaadin Ltd
  */
-public class FormView extends VerticalLayout
-        implements PortletView {
+public class FormView extends VerticalLayout implements PortletView {
 
     public static final String ACTION_EDIT = "Edit";
     public static final String ACTION_SAVE = "Save";
@@ -57,10 +57,13 @@ public class FormView extends VerticalLayout
     @Override
     public void onPortletViewContextInit(PortletViewContext context) {
         this.portletViewContext = context;
-        context.addPortletModeChangeListener(this::handlePortletMode);
+        context.addEventChangeListener("contact-selected", this::handleEvent);
+        context.addPortletModeChangeListener(this::handlePortletModeChange);
+        context.addWindowStateChangeListener(this::handleWindowStateChange);
+        init();
     }
 
-    public void init() {
+    private void init() {
         FormLayout formLayout = populateFormLayout();
         setupButtons();
 
@@ -76,21 +79,6 @@ public class FormView extends VerticalLayout
 
     private WindowState getWindowState() {
         return portletViewContext.getWindowState();
-    }
-
-    private String getItemSelectFunction() {
-        StringBuilder selectAction = new StringBuilder();
-
-        selectAction.append("const poller = () => {");
-        selectAction.append(" if(hub.isInProgress()) {");
-        selectAction.append("  setTimeout(poller, 10);");
-        selectAction.append(" } else {");
-        selectAction.append("  hub.action(state);");
-        selectAction.append(" }");
-        selectAction.append("};");
-        selectAction.append("poller();");
-
-        return selectAction.toString();
     }
 
     private FormLayout populateFormLayout() {
@@ -116,50 +104,47 @@ public class FormView extends VerticalLayout
         binder.setReadOnly(PortletMode.VIEW.equals(getPortletMode()));
 
         image = new Image();
+        image.setMaxHeight("72px");
+        image.setMaxWidth("72px");
         formLayout.add(image);
         return formLayout;
     }
 
     private void setupButtons() {
-        action = new Button(PortletMode.EDIT
-                .equals(getPortletMode()) ?
-                ACTION_SAVE :
-                ACTION_EDIT, event -> {
-            if (PortletMode.EDIT.equals(getPortletMode())) {
-                save();
-            } else {
-                portletViewContext.setPortletMode(PortletMode.EDIT);
-            }
-        });
+        action = new Button(
+                PortletMode.EDIT.equals(getPortletMode()) ? ACTION_SAVE
+                        : ACTION_EDIT,
+                event -> {
+                    if (PortletMode.EDIT.equals(getPortletMode())) {
+                        save();
+                    } else {
+                        portletViewContext.setPortletMode(PortletMode.EDIT);
+                    }
+                });
 
         cancel = new Button("Cancel", event -> cancel());
 
         windowState = new Button(
-                WindowState.NORMAL.equals(getWindowState()) ?
-                        WINDOW_MAXIMIZE :
-                        WINDOW_NORMALIZE, event -> switchWindowState());
+                WindowState.NORMAL.equals(getWindowState()) ? WINDOW_MAXIMIZE
+                        : WINDOW_NORMALIZE,
+                event -> switchWindowState());
     }
 
     private void switchWindowState() {
-        FormPortlet portlet = FormPortlet.getCurrent();
         if (WindowState.NORMAL.equals(getWindowState())) {
             portletViewContext.setWindowState(WindowState.MAXIMIZED);
-            windowState.setText(WINDOW_NORMALIZE);
         } else if (WindowState.MAXIMIZED.equals(getWindowState())) {
             portletViewContext.setWindowState(WindowState.NORMAL);
-            windowState.setText(WINDOW_MAXIMIZE);
         }
     }
 
-    public void handleEvent(PortletEvent event) {
+    private void handleEvent(PortletEvent event) {
         Integer contactId = Integer
                 .parseInt(event.getParameters().get("contactId")[0]);
         Optional<Contact> contact = ContactService.getInstance()
                 .findById(contactId);
         if (contact.isPresent()) {
             binder.setBean(contact.get());
-
-            firstName.setValue(contact.get().getFirstName());
             image.setSrc(contact.get().getImage().toString());
         } else {
             cancel();
@@ -168,9 +153,7 @@ public class FormView extends VerticalLayout
 
     private void cancel() {
         if (binder.getBean() != null) {
-            binder.setBean(null);
             portletViewContext.setPortletMode(PortletMode.VIEW);
-            action.setText(ACTION_EDIT);
         }
     }
 
@@ -184,7 +167,15 @@ public class FormView extends VerticalLayout
         portletViewContext.setPortletMode(PortletMode.VIEW);
     }
 
-    private void handlePortletMode(PortletModeEvent event) {
+    private void handleWindowStateChange(WindowStateEvent event) {
+        if (WindowState.MAXIMIZED.equals(event.getWindowState())) {
+            windowState.setText(WINDOW_NORMALIZE);
+        } else if (WindowState.NORMAL.equals(event.getWindowState())) {
+            windowState.setText(WINDOW_MAXIMIZE);
+        }
+    }
+
+    private void handlePortletModeChange(PortletModeEvent event) {
         binder.setReadOnly(PortletMode.VIEW.equals(event.getPortletMode()));
         if (event.isEditMode()) {
             action.setText(ACTION_SAVE);

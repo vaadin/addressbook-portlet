@@ -50,14 +50,17 @@ public class ContactService {
                             json.getObject("name").getString("first"));
                     contact.setLastName(
                             json.getObject("name").getString("last"));
-                    contact.setBirthDate(LocalDateTime.ofInstant(Instant.parse(
-                            json.getObject("dob").getString("date")), ZoneId
-                            .of(ZoneOffset.UTC.getId())).toLocalDate());
+                    contact.setBirthDate(LocalDateTime
+                            .ofInstant(
+                                    Instant.parse(json.getObject("dob")
+                                            .getString("date")),
+                                    ZoneId.of(ZoneOffset.UTC.getId()))
+                            .toLocalDate());
                     contact.setEmail(json.getString("email"));
                     contact.setPhoneNumber(json.getString("phone"));
                     try {
-                        contact.setImage(new URL(json.getObject("picture")
-                                .getString("medium")));
+                        contact.setImage(new URL(
+                                json.getObject("picture").getString("medium")));
                     } catch (MalformedURLException e) {
                     }
                     contacts.put(i, contact);
@@ -67,7 +70,7 @@ public class ContactService {
     }
 
     public static ContactService getInstance() {
-        if(service == null) {
+        if (service == null) {
             service = new ContactService();
         }
         return service;
@@ -82,7 +85,8 @@ public class ContactService {
     }
 
     private Optional<JsonObject> getRandomUsers(int num, String seed) {
-        String url = "https://randomuser.me/api/?results=" + num + "&exc=login,location&nat=us&noinfo&seed=" + seed;
+        String url = "https://randomuser.me/api/?results=" + num
+                + "&exc=login,location&nat=us&noinfo&seed=" + seed;
         HttpURLConnection con = null;
         try {
             URL obj = new URL(url);

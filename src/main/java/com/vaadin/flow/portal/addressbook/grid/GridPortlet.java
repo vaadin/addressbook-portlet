@@ -19,14 +19,6 @@ import com.vaadin.flow.portal.VaadinPortlet;
 
 /**
  * @author Vaadin Ltd
- *
  */
 public class GridPortlet extends VaadinPortlet<GridView> {
-
-    public static final String TAG = "grid-portlet";
-
-    @Override
-    public String getTag() {
-        return TAG;
-    }
 }
