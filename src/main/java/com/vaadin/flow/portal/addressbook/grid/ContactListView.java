@@ -16,8 +16,10 @@
 package com.vaadin.flow.portal.addressbook.grid;
 
 import javax.portlet.WindowState;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -26,13 +28,14 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.portal.addressbook.backend.Contact;
 import com.vaadin.flow.portal.addressbook.backend.ContactService;
+import com.vaadin.flow.portal.handler.PortletEvent;
 import com.vaadin.flow.portal.handler.PortletView;
 import com.vaadin.flow.portal.handler.PortletViewContext;
 
 /**
  * @author Vaadin Ltd
  */
-public class GridView extends VerticalLayout implements PortletView {
+public class ContactListView extends VerticalLayout implements PortletView {
 
     public static final String SELECTION = "selection";
     private ListDataProvider<Contact> dataProvider;
@@ -45,9 +48,19 @@ public class GridView extends VerticalLayout implements PortletView {
     @Override
     public void onPortletViewContextInit(PortletViewContext context) {
         portletViewContext = context;
+        context.addEventChangeListener("contact-updated",
+                this::onContactUpdated);
         context.addWindowStateChangeListener(
                 event -> handleWindowStateChanged(event.getWindowState()));
         init();
+    }
+
+    private void onContactUpdated(PortletEvent event) {
+        int contactId = Integer
+                .parseInt(event.getParameters().get("contactId")[0]);
+        Optional<Contact> contact = ContactService.getInstance()
+                .findById(contactId);
+        contact.ifPresent(value -> dataProvider.refreshItem(value));
     }
 
     private void handleWindowStateChanged(WindowState windowState) {
@@ -87,8 +100,8 @@ public class GridView extends VerticalLayout implements PortletView {
             ItemClickEvent<Contact> contactItemClickEvent) {
         Integer contactId = contactItemClickEvent.getItem().getId();
 
-        Map<String, String> param = new HashMap<>();
-        param.put("contactId", Integer.toString(contactId));
+        Map<String, String> param = Collections.singletonMap(
+                "contactId", contactId.toString());
 
         portletViewContext.fireEvent("contact-selected", param);
     }

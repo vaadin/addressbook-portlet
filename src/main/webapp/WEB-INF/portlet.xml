@@ -5,9 +5,9 @@
              xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/portlet http://xmlns.jcp.org/xml/ns/portlet/portlet-app_3_0.xsd"
              version="3.0">
     <portlet>
-        <portlet-name>Form</portlet-name>
-        <display-name>Flow Portlet with Form</display-name>
-        <portlet-class>com.vaadin.flow.portal.addressbook.form.FormPortlet</portlet-class>
+        <portlet-name>ContactForm</portlet-name>
+        <display-name>Contact Form</display-name>
+        <portlet-class>com.vaadin.flow.portal.addressbook.form.ContactFormPortlet</portlet-class>
         <expiration-cache>0</expiration-cache>
         <supports>
             <mime-type>text/html</mime-type>
@@ -15,24 +15,24 @@
             <portlet-mode>EDIT</portlet-mode>
         </supports>
         <portlet-info>
-            <title>Form Portlet - formportlet</title>
-            <short-title>formportlet</short-title>
+            <title>Contact Form</title>
+            <short-title>Contact</short-title>
             <keywords></keywords>
         </portlet-info>
     </portlet>
 
     <portlet>
-        <portlet-name>Grid</portlet-name>
-        <display-name>Flow Portlet with Grid</display-name>
-        <portlet-class>com.vaadin.flow.portal.addressbook.grid.GridPortlet</portlet-class>
+        <portlet-name>ContactList</portlet-name>
+        <display-name>Contact List</display-name>
+        <portlet-class>com.vaadin.flow.portal.addressbook.grid.ContactListPortlet</portlet-class>
         <expiration-cache>0</expiration-cache>
         <supports>
             <mime-type>text/html</mime-type>
             <portlet-mode>VIEW</portlet-mode>
         </supports>
         <portlet-info>
-            <title>Grid Portlet - gridportlet</title>
-            <short-title>gridportlet</short-title>
+            <title>Contact List</title>
+            <short-title>Contacts</short-title>
             <keywords></keywords>
         </portlet-info>
     </portlet>

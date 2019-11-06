@@ -20,5 +20,5 @@ import com.vaadin.flow.portal.VaadinPortlet;
 /**
  * @author Vaadin Ltd
  */
-public class GridPortlet extends VaadinPortlet<GridView> {
+public class ContactListPortlet extends VaadinPortlet<ContactListView> {
 }
