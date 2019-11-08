@@ -12,24 +12,30 @@ We currently support [Apache Pluto](https://portals.apache.org/pluto/). The
 easiest way to try out your application is to run a Maven goal which downloads 
 and starts an embedded Tomcat 8 serving the Pluto Portal driver:
 
-`mvn package cargo:run -Pautosetup,production`
+First build the whole project using `mvn install` in the root
+
+then in the module `portal` execute
+`mvn package cargo:run -Pautosetup`
 
 Visit http://localhost:8080/pluto, and log in as `pluto`, password `pluto`.
 
 The deployed portlet needs to be added to a portal page. Do this by
 1) Selecting `Pluto Admin` page
 2) Select `About Apache Pluto` from the drop-down under "Portal Pages"
-3) Select `/portlet-address-book` from the left drop-down under "Portlet Applications"
+3) Select `/address-book-grid` from the left drop-down under "Portlet Applications"
 4) Select `Grid` from the drop-down on the right
 5) Click the `Add Portlet` button
-6) Repeat steps 2-5 for the `Form` portlet
+6) Select `About Apache Pluto` from the drop-down under "Portal Pages"
+7) Select `/address-book-form` from the left drop-down under "Portlet Applications"
+8) Select `Form` from the drop-down on the right
+9) Click the `Add Portlet` button
 
 Once you navigate to `About Apache Pluto` page, the `Grid` and the `Form` portlets should be
 visible on the page.
 
-For the consecutive runs, use the following command to reuse the already downloaded Tomcat and Pluto:
+For the consecutive runs after installing, use the following command to reuse the already downloaded Tomcat and Pluto:
 
-`mvn package cargo:run -Pautocopy,production`
+`mvn package cargo:run -Pautocopy`
 
 ## Remote debugging for Portal
 
@@ -41,8 +47,8 @@ To build the production .war run:
 
 `mvn package -Pproduction`
 
-Deploy both `portlet-address-book.war` and `vaadin-portlet-static.war` from `/target`
-folder to your web server / portal. 
+Deploy all wars `addressbook-grid/target/address-book-grid.war`, `addressbook-form/target/address-book-form.war`
+and `addressbook-bundle/target/vaadin-portlet-static.war` folder to your web server / portal. 
 
 ## Notes about the project
 

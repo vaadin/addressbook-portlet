@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.vaadin</groupId>
+        <artifactId>portlet-address-book</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.vaadin</groupId>
+    <artifactId>address-book-static-bundle</artifactId>
+    <name>Address book static files bundle</name>
+    <packaging>war</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>address-book-backend</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-portlet</artifactId>
+            <version>${vaadin-portlet.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>flow-data</artifactId>
+            <version>${flow.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>flow-server</artifactId>
+            <version>${flow.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>flow-client</artifactId>
+            <version>${flow.version}</version>
+        </dependency>
+
+        <!-- Portlet API -->
+        <dependency>
+            <groupId>javax.portlet</groupId>
+            <artifactId>portlet-api</artifactId>
+            <version>3.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>vaadin-portlet-static</finalName>
+
+        <plugins>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>../addressbook-form/src/main/java</source>
+                                <source>../addressbook-grid/src/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.vaadin</groupId>
+                <!-- Using Flow plugin instead of Vaadin plugin due to lacking prerelease of Vaadin 14.2 -->
+                <artifactId>flow-maven-plugin</artifactId>
+                <version>${flow.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-frontend</goal>
+                            <goal>build-frontend</goal>
+                        </goals>
+                        <configuration>
+                            <productionMode>true</productionMode>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <!-- Generate 2 war archives for portlet. One for the portlet and another for the static files -->
+                <executions>
+                    <!-- Generate a static war 'vaadin-portlet-static.war' with all static files -->
+                    <execution>
+                        <goals>
+                            <goal>war</goal>
+                        </goals>
+                        <configuration>
+                            <!-- static files should contain flow-client and all build files generated in VAADIN/ -->
+                            <packagingIncludes>WEB-INF/lib/flow-client*.jar,VAADIN/</packagingIncludes>
+
+                            <webResources>
+                                <resource>
+                                    <!-- this is relative to the pom.xml directory -->
+                                    <directory>target/classes/META-INF/</directory>
+                                    <!-- Include all files and folders below <directory> -->
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                    <!-- do not include configuration files -->
+                                    <excludes>
+                                        <exclude>VAADIN/config/**</exclude>
+                                    </excludes>
+                                </resource>
+                            </webResources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+
+<!--                    <execution>-->
+<!--                        <id>copy-source-files</id>-->
+<!--                        <phase>generate-sources</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>run</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <tasks>-->
+<!--                                <copy todir="src/main/java">-->
+<!--                                    <fileset dir="../addressbook-form/src/main/java"/>-->
+<!--                                    <fileset dir="../addressbook-grid/src/main/java"/>-->
+<!--                                </copy>-->
+<!--                            </tasks>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+                    <execution>
+                        <id>copy-files</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy todir="../target/META-INF/VAADIN/config">
+                                    <fileset dir="${project.build.directory}/classes/META-INF/VAADIN/config"/>
+                                </copy>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
