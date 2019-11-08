@@ -51,6 +51,8 @@ public class ContactFormView extends VerticalLayout implements PortletView {
 
     private PortletViewContext portletViewContext;
 
+    private ContactService service;
+
     @Override
     public void onPortletViewContextInit(PortletViewContext context) {
         this.portletViewContext = context;
@@ -58,6 +60,13 @@ public class ContactFormView extends VerticalLayout implements PortletView {
                 this::onContactSelected);
         context.addPortletModeChangeListener(this::handlePortletModeChange);
         init();
+    }
+
+    private ContactService getService() {
+        if(service == null) {
+            service = new ContactService();
+        }
+        return service;
     }
 
     private void init() {
@@ -120,12 +129,12 @@ public class ContactFormView extends VerticalLayout implements PortletView {
     private void onContactSelected(PortletEvent event) {
         int contactId = Integer
                 .parseInt(event.getParameters().get("contactId")[0]);
-        Optional<Contact> contact = ContactService.getInstance()
+        Optional<Contact> contact = getService()
                 .findById(contactId);
         if (contact.isPresent()) {
             this.contact = contact.get();
             binder.readBean(this.contact);
-            image.setSrc(this.contact.getImage().toString());
+            image.setSrc(this.contact.getImage());
         } else {
             clear();
         }
@@ -145,7 +154,7 @@ public class ContactFormView extends VerticalLayout implements PortletView {
     private void save() {
         if (contact != null) {
             binder.writeBeanIfValid(contact);
-            ContactService.getInstance().save(contact);
+            getService().save(contact);
             fireUpdateEvent(contact);
         }
 

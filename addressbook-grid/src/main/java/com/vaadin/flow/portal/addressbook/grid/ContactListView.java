@@ -44,6 +44,7 @@ public class ContactListView extends VerticalLayout implements PortletView {
     private Button windowStateButton;
 
     private PortletViewContext portletViewContext;
+    private ContactService service;
 
     @Override
     public void onPortletViewContextInit(PortletViewContext context) {
@@ -55,10 +56,17 @@ public class ContactListView extends VerticalLayout implements PortletView {
         init();
     }
 
+    private ContactService getService() {
+        if(service == null) {
+            service = new ContactService();
+        }
+        return service;
+    }
+
     private void onContactUpdated(PortletEvent event) {
         int contactId = Integer
                 .parseInt(event.getParameters().get("contactId")[0]);
-        Optional<Contact> contact = ContactService.getInstance()
+        Optional<Contact> contact = getService()
                 .findById(contactId);
         contact.ifPresent(value -> dataProvider.refreshItem(value));
     }
@@ -80,7 +88,7 @@ public class ContactListView extends VerticalLayout implements PortletView {
         setWidthFull();
 
         dataProvider = new ListDataProvider<>(
-                ContactService.getInstance().getContacts());
+                getService().getContacts());
 
         grid.setDataProvider(dataProvider);
         grid.removeColumnByKey("id");

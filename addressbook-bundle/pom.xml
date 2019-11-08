@@ -30,7 +30,6 @@
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-portlet</artifactId>
             <version>${vaadin-portlet.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -96,6 +95,7 @@
                         </goals>
                         <configuration>
                             <productionMode>true</productionMode>
+                            <optimizeBundle>false</optimizeBundle>
                         </configuration>
                     </execution>
                 </executions>

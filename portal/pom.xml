@@ -41,19 +41,19 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
+                                        <mkdir dir="${project.build.directory}"/>
                                         <get src="ftp://ftp.funet.fi/pub/mirrors/apache.org/portals/pluto/pluto-bundle-${pluto.version}.zip"
                                              dest="${project.build.directory}/pluto.zip"
                                              verbose="false"
                                              usetimestamp="true"/>
                                         <unzip src="${project.build.directory}/pluto.zip"
                                                dest="${project.build.directory}"/>
-                                        <copy todir="${project.build.directory}/pluto-${pluto.version}/webapps">
-                                            <resources>
-                                                <file file="../addressbook-grid/target/address-book-grid.war"/>
-                                                <file file="../addressbook-form/target/address-book-form.war"/>
-                                                <file file="../addressbook-bundle/target/vaadin-portlet-static.war"/>
-                                            </resources>
-                                        </copy>
+                                        <copy file="../addressbook-grid/target/address-book-grid.war"
+                                              todir="${project.build.directory}/pluto-${pluto.version}/webapps"/>
+                                        <copy file="../addressbook-form/target/address-book-form.war"
+                                              todir="${project.build.directory}/pluto-${pluto.version}/webapps"/>
+                                        <copy file="../addressbook-bundle/target/vaadin-portlet-static.war"
+                                              todir="${project.build.directory}/pluto-${pluto.version}/webapps"/>
                                     </tasks>
                                 </configuration>
                             </execution>
@@ -85,13 +85,12 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <copy todir="${project.build.directory}/pluto-${pluto.version}/webapps">
-                                            <resources>
-                                                <file file="../addressbook-grid/target/address-book-grid.war"/>
-                                                <file file="../addressbook-form/target/address-book-form.war"/>
-                                                <file file="../addressbook-bundle/target/vaadin-portlet-static.war"/>
-                                            </resources>
-                                        </copy>
+                                        <copy file="../addressbook-grid/target/address-book-grid.war"
+                                              todir="${project.build.directory}/pluto-${pluto.version}/webapps"/>
+                                        <copy file="../addressbook-form/target/address-book-form.war"
+                                              todir="${project.build.directory}/pluto-${pluto.version}/webapps"/>
+                                        <copy file="../addressbook-bundle/target/vaadin-portlet-static.war"
+                                              todir="${project.build.directory}/pluto-${pluto.version}/webapps"/>
                                     </tasks>
                                 </configuration>
                             </execution>

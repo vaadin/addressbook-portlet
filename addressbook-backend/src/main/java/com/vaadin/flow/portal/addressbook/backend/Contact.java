@@ -17,7 +17,10 @@
 package com.vaadin.flow.portal.addressbook.backend;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 public class Contact implements Serializable {
@@ -29,10 +32,20 @@ public class Contact implements Serializable {
     private String phoneNumber;
     private String email;
     private LocalDate birthDate;
-    private URL image;
+    private String image;
 
     public Contact(Integer id) {
         this.id = id;
+    }
+
+    public Contact(ResultSet resultSet) throws SQLException {
+        id = resultSet.getInt("id");
+        firstName = resultSet.getString("firstName");
+        lastName = resultSet.getString("lastName");
+        phoneNumber = resultSet.getString("phoneNumber");
+        email=resultSet.getString("email");
+        birthDate=LocalDate.parse(resultSet.getString("birthDate"));
+            image = resultSet.getString("imageUrl");
     }
 
     public Integer getId() {
@@ -79,11 +92,11 @@ public class Contact implements Serializable {
         this.birthDate = birthDate;
     }
 
-    public URL getImage() {
+    public String getImage() {
         return image;
     }
 
-    public void setImage(URL image) {
+    public void setImage(String image) {
         this.image = image;
     }
 }
