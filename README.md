@@ -50,6 +50,46 @@ To build the production .war run:
 Deploy all wars `addressbook-grid/target/address-book-grid.war`, `addressbook-form/target/address-book-form.war`
 and `addressbook-bundle/target/vaadin-portlet-static.war` folder to your web server / portal. 
 
+## Adding a new Portlet module
+
+To add a new Portlet module to the project create a default vaadin portlet module.
+The module should contain its own portlet.xml file.
+
+Add to the new module the following plugin:
+````xml
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-antrun-plugin</artifactId>
+    <executions>
+        <execution>
+            <id>copy-files</id>
+            <phase>generate-resources</phase>
+            <goals>
+                <goal>run</goal>
+            </goals>
+            <configuration>
+                <tasks>
+                    <copy todir="${project.build.directory}/classes/META-INF/VAADIN/config">
+                        <fileset dir="../target/META-INF/VAADIN/config" />
+                    </copy>
+                </tasks>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+````
+
+Add the module sources to the bundle module `build-helper-maven-plugin` as added sources:
+
+````xml
+<sources>
+  <source>../moduleName/src/main/java</source>
+  ...
+</sources>
+````
+
+Then build the whole project again with `mvn install`
+
 ## Notes about the project
 
 Vaadin 14+ portlet support feature is still under development and changes to
