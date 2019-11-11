@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.ItemClickEvent;
@@ -37,7 +38,6 @@ import com.vaadin.flow.portal.handler.PortletViewContext;
  */
 public class ContactListView extends VerticalLayout implements PortletView {
 
-    public static final String SELECTION = "selection";
     private ListDataProvider<Contact> dataProvider;
 
     private Grid<Contact> grid = new Grid<>(Contact.class);
@@ -82,6 +82,13 @@ public class ContactListView extends VerticalLayout implements PortletView {
             grid.setColumns("firstName", "lastName", "phoneNumber");
             grid.setMinWidth("450px");
         }
+    }
+
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        dataProvider = new ListDataProvider<>(
+            getService().getContacts());
+        grid.setDataProvider(dataProvider);
     }
 
     private void init() {

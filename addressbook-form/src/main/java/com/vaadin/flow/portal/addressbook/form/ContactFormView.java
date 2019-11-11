@@ -20,7 +20,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
+import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -41,6 +43,7 @@ import com.vaadin.flow.portal.handler.PortletViewContext;
 public class ContactFormView extends VerticalLayout implements PortletView {
 
     private static final String ACTION_EDIT = "Edit";
+    private static final String ACTION_CREATE = "Create new";
     private static final String ACTION_SAVE = "Save";
 
     private Binder<Contact> binder;
@@ -48,6 +51,7 @@ public class ContactFormView extends VerticalLayout implements PortletView {
     private Contact contact;
     private Button action;
     private Button cancel;
+    private Button remove;
 
     private PortletViewContext portletViewContext;
 
@@ -63,7 +67,7 @@ public class ContactFormView extends VerticalLayout implements PortletView {
     }
 
     private ContactService getService() {
-        if(service == null) {
+        if (service == null) {
             service = new ContactService();
         }
         return service;
@@ -73,7 +77,8 @@ public class ContactFormView extends VerticalLayout implements PortletView {
         FormLayout formLayout = populateFormLayout();
         setupButtons();
 
-        HorizontalLayout actionButtons = new HorizontalLayout(action, cancel);
+        HorizontalLayout actionButtons = new HorizontalLayout(action, cancel,
+                remove);
         add(formLayout, actionButtons);
         setHorizontalComponentAlignment(Alignment.END, actionButtons);
     }
@@ -96,45 +101,61 @@ public class ContactFormView extends VerticalLayout implements PortletView {
         EmailField email = new EmailField();
         formLayout.addFormItem(email, "Email");
 
+        DatePicker birthDate = new DatePicker();
+        formLayout.addFormItem(birthDate, "Birth date");
+
         binder = new Binder<>(Contact.class);
         binder.bind(firstName, "firstName");
         binder.bind(lastName, "lastName");
         binder.bind(email, "email");
         binder.bind(phone, "phoneNumber");
+        binder.bind(birthDate, "birthDate");
+
         // Set the state of form depending on portlet mode.
         binder.setReadOnly(PortletMode.VIEW.equals(getPortletMode()));
 
         image = new Image();
         image.setMaxHeight("72px");
         image.setMaxWidth("72px");
+        image.setVisible(false);
         formLayout.add(image);
         return formLayout;
     }
 
     private void setupButtons() {
-        action = new Button(
-                PortletMode.EDIT.equals(getPortletMode()) ? ACTION_SAVE
-                        : ACTION_EDIT,
-                event -> {
-                    if (PortletMode.EDIT.equals(getPortletMode())) {
-                        save();
-                    } else if (contact != null) {
-                        portletViewContext.setPortletMode(PortletMode.EDIT);
-                    }
-                });
+        action = new Button("action", event -> {
+            if (PortletMode.EDIT.equals(getPortletMode())) {
+                save();
+            } else {
+                portletViewContext.setPortletMode(PortletMode.EDIT);
+            }
+        });
 
         cancel = new Button("Cancel", event -> cancel());
+        remove = new Button("Remove", event -> remove());
+        remove.setVisible(false);
+        updateActionText();
+    }
+
+    private void updateActionText() {
+        action.setText(PortletMode.EDIT.equals(getPortletMode()) ?
+                ACTION_SAVE :
+                contact == null ? ACTION_CREATE : ACTION_EDIT);
     }
 
     private void onContactSelected(PortletEvent event) {
         int contactId = Integer
                 .parseInt(event.getParameters().get("contactId")[0]);
-        Optional<Contact> contact = getService()
-                .findById(contactId);
+        Optional<Contact> contact = getService().findById(contactId);
         if (contact.isPresent()) {
             this.contact = contact.get();
+            updateActionText();
             binder.readBean(this.contact);
-            image.setSrc(this.contact.getImage());
+            if (this.contact.getImage() != null) {
+                image.setSrc(this.contact.getImage());
+                image.setVisible(true);
+            }
+            remove.setVisible(true);
         } else {
             clear();
         }
@@ -146,9 +167,31 @@ public class ContactFormView extends VerticalLayout implements PortletView {
     }
 
     private void cancel() {
-        binder.readBean(contact);
-        image.setSrc(contact != null ? contact.getImage().toString() : "");
-        portletViewContext.setPortletMode(PortletMode.VIEW);
+        if (contact != null) {
+            image.setSrc(contact.getImage());
+            image.setVisible(true);
+        }
+        if (PortletMode.EDIT.equals(getPortletMode())) {
+            binder.readBean(contact);
+            portletViewContext.setPortletMode(PortletMode.VIEW);
+        } else {
+            contact = null;
+            binder.removeBean();
+            binder.getFields().forEach(HasValue::clear);
+            image.setVisible(false);
+            remove.setVisible(false);
+        }
+        updateActionText();
+    }
+
+    private void remove() {
+        if (contact != null) {
+            getService().remove(contact);
+            contact = null;
+            cancel();
+            portletViewContext.setPortletMode(PortletMode.VIEW);
+        }
+        updateActionText();
     }
 
     private void save() {
@@ -156,14 +199,20 @@ public class ContactFormView extends VerticalLayout implements PortletView {
             binder.writeBeanIfValid(contact);
             getService().save(contact);
             fireUpdateEvent(contact);
+        } else {
+            contact = new Contact(getService().getNextId());
+            binder.writeBeanIfValid(contact);
+            getService().create(contact);
+            fireUpdateEvent(contact);
         }
+        updateActionText();
 
         portletViewContext.setPortletMode(PortletMode.VIEW);
     }
 
     private void fireUpdateEvent(Contact contact) {
-        Map<String, String> param = Collections.singletonMap("contactId",
-                contact.getId().toString());
+        Map<String, String> param = Collections
+                .singletonMap("contactId", contact.getId().toString());
 
         portletViewContext.fireEvent("contact-updated", param);
     }

@@ -13,15 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package com.vaadin.flow.portal.addressbook.backend;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -36,45 +31,42 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.slf4j.LoggerFactory;
 
-import elemental.json.Json;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
 
+/**
+ * Service for getting and storing contacts to a SQL DataBase.
+ */
 public class ContactService {
-    //    private static Map<Integer, Contact> contacts = new HashMap<>();
-    //    private static final ContactService INSTANCE = new ContactService();
+
     private String dbFile;
 
+    /**
+     * Create a service instance. This will init a DataBase if one doesn't
+     * exist.
+     */
     public ContactService() {
         try {
+            // This is for pluto as it seems to not find the driver class if not explicitly loaded
             Class.forName("org.sqlite.JDBC");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        //        synchronized (dbFile) {
         if (dbFile == null) {
             createNewDatabase();
 
-            int contacts = 0;
-            try (Connection conn = connect(); Statement stmt = conn
-                    .createStatement()) {
-                ResultSet resultSet = stmt
-                        .executeQuery("SELECT COUNT(*) AS total FROM contacts");
-                contacts = resultSet.getInt("total");
-            } catch (SQLException e) {
-                LoggerFactory.getLogger(getClass())
-                        .error("Failed to get contacts", e);
-            }
+            int contacts = getContactsCount();
 
             if (contacts == 0) {
-                getRandomUsers(20, "contacts").ifPresent(result -> {
+                UsersUtil.getRandomUsers(20, "contacts").ifPresent(result -> {
                     JsonArray results = result.getArray("results");
                     for (int i = 0; i < results.length(); i++) {
-                        Contact contact = new Contact(i);
+                        Contact contact = new Contact(i+1);
                         JsonObject json = results.getObject(i);
                         contact.setFirstName(
                                 json.getObject("name").getString("first"));
@@ -87,34 +79,60 @@ public class ContactService {
                                 .toLocalDate());
                         contact.setEmail(json.getString("email"));
                         contact.setPhoneNumber(json.getString("phone"));
-                        contact.setImage("https://randomuser.me/"+
+                        contact.setImage(
                                 json.getObject("picture").getString("medium"));
-                        save(contact);
+                        create(contact);
                     }
 
                 });
             }
         }
-        //        }
     }
 
-    private Connection connect() {
-
-        String url = "jdbc:sqlite:" + dbFile;
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(url);
+    /**
+     * Get the amount of contacts stored in the database.
+     *
+     * @return number of contacts in database
+     */
+    public int getContactsCount() {
+        int contacts = 0;
+        try (Connection conn = connect(); Statement stmt = conn
+                .createStatement()) {
+            ResultSet resultSet = stmt
+                    .executeQuery("SELECT COUNT(*) AS total FROM contacts");
+            contacts = resultSet.getInt("total");
         } catch (SQLException e) {
             LoggerFactory.getLogger(getClass())
-                    .error("Failed to connect to DB '{}'", e.getMessage());
+                    .error("Failed to get contacts", e);
         }
-        return conn;
+        return contacts;
     }
 
-    //    public static ContactService getInstance() {
-    //        return INSTANCE;
-    //    }
+    /**
+     * Get the next available id for a new contact. This will be the max id
+     * stored +1.
+     *
+     * @return next available contact id
+     */
+    public int getNextId() {
+        int nextId = 0;
+        try (Connection conn = connect(); Statement stmt = conn
+                .createStatement()) {
+            ResultSet resultSet = stmt
+                    .executeQuery("SELECT MAX(id) AS total FROM contacts");
+            nextId = resultSet.getInt("total") + 1;
+        } catch (SQLException e) {
+            LoggerFactory.getLogger(getClass())
+                    .error("Failed to get contacts max id", e);
+        }
+        return nextId;
+    }
 
+    /**
+     * Get all contacts stored into the database.
+     *
+     * @return collection of contacts
+     */
     public Collection<Contact> getContacts() {
         List<Contact> contacts = new ArrayList<>();
         try (Connection conn = connect(); Statement stmt = conn
@@ -130,6 +148,13 @@ public class ContactService {
         return contacts;
     }
 
+    /**
+     * Get a contact by id from the database.
+     *
+     * @param contactId
+     *         id of contact to fetch
+     * @return contact for id or empty if none found
+     */
     public Optional<Contact> findById(int contactId) {
         Contact contact = null;
         String sql = "SELECT * FROM contacts WHERE id='" + contactId + "';";
@@ -144,40 +169,42 @@ public class ContactService {
         return Optional.ofNullable(contact);
     }
 
-    private Optional<JsonObject> getRandomUsers(int num, String seed) {
-        String url = "https://randomuser.me/api/?results=" + num
-                + "&exc=login,location&nat=us&noinfo&seed=" + seed;
-        HttpURLConnection con = null;
-        try {
-            URL obj = new URL(url);
-            con = (HttpURLConnection) obj.openConnection();
+    /**
+     * Update contents for an existing contact.
+     *
+     * @param contact
+     *         contact to update details for, not <code>null</code>
+     */
+    public void save(Contact contact) {
+        Objects.requireNonNull(contact);
+        String insert = "UPDATE contacts SET firstName = ?,lastName = ?,phoneNumber = ?,email = ?,birthDate = ?,imageUrl = ? WHERE id = ?";
 
-            // optional default is GET
-            con.setRequestMethod("GET");
-
-            int responseCode = con.getResponseCode();
-            if (responseCode != 200) {
-                return Optional.empty();
-            }
-
-            StringBuffer response = new StringBuffer();
-            try (BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()))) {
-                String inputLine;
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-            }
-            return Optional.of(Json.parse(response.toString()));
-        } catch (IOException e) {
-            e.printStackTrace();
+        try (Connection conn = connect(); PreparedStatement pstmt = conn
+                .prepareStatement(insert)) {
+            pstmt.setString(1, contact.getFirstName());
+            pstmt.setString(2, contact.getLastName());
+            pstmt.setString(3, contact.getPhoneNumber());
+            pstmt.setString(4, contact.getEmail());
+            pstmt.setString(5, contact.getBirthDate().toString());
+            pstmt.setString(6, contact.getImage());
+            pstmt.setInt(7, contact.getId());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            LoggerFactory.getLogger(getClass())
+                    .error("Failed to insert contact due to '{}'",
+                            e.getMessage(), e);
         }
-
-        return Optional.empty();
     }
 
-    public void save(Contact contact) {
+    /**
+     * Create a new contact row into the database.
+     * Will throw an exception if 'id' already exists in the database.
+     *
+     * @param contact
+     *         contact to add to database, not <code>null</code>
+     */
+    public void create(Contact contact) {
+        Objects.requireNonNull(contact);
         String insert = "INSERT INTO contacts(id,firstName,lastName,phoneNumber,email,birthDate,imageUrl) VALUES(?,?,?,?,?,?,?)";
 
         try (Connection conn = connect(); PreparedStatement pstmt = conn
@@ -197,6 +224,44 @@ public class ContactService {
         }
     }
 
+    /**
+     * Remove a contact row from the database.
+     * @param contact contact to remove, not <code>null</code>
+     */
+    public void remove(Contact contact) {
+        Objects.requireNonNull(contact);
+        String remove = "DELETE FROM contacts WHERE id = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn
+                .prepareStatement(remove)) {
+            pstmt.setInt(1, contact.getId());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            LoggerFactory.getLogger(getClass())
+                    .error("Failed to remove contact due to '{}'",
+                            e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create connection to database.
+     *
+     * @return connection to database
+     */
+    private Connection connect() {
+        String url = "jdbc:sqlite:" + dbFile;
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(url);
+        } catch (SQLException e) {
+            LoggerFactory.getLogger(getClass())
+                    .error("Failed to connect to DB '{}'", e.getMessage());
+        }
+        return conn;
+    }
+
+    /**
+     * Create a new database if no file exists. Add contacts table.
+     */
     private void createNewDatabase() {
         File tempDir = new File(System.getProperty("java.io.tmpdir"));
         File database = new File(tempDir, "vaadin-portal.db");

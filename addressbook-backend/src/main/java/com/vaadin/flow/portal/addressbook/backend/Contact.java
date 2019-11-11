@@ -17,11 +17,11 @@
 package com.vaadin.flow.portal.addressbook.backend;
 
 import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+
+import com.helger.commons.hashcode.HashCodeGenerator;
 
 public class Contact implements Serializable {
 
@@ -32,7 +32,7 @@ public class Contact implements Serializable {
     private String phoneNumber;
     private String email;
     private LocalDate birthDate;
-    private String image;
+    private String image = "";
 
     public Contact(Integer id) {
         this.id = id;
@@ -43,9 +43,9 @@ public class Contact implements Serializable {
         firstName = resultSet.getString("firstName");
         lastName = resultSet.getString("lastName");
         phoneNumber = resultSet.getString("phoneNumber");
-        email=resultSet.getString("email");
-        birthDate=LocalDate.parse(resultSet.getString("birthDate"));
-            image = resultSet.getString("imageUrl");
+        email = resultSet.getString("email");
+        birthDate = LocalDate.parse(resultSet.getString("birthDate"));
+        image = resultSet.getString("imageUrl");
     }
 
     public Integer getId() {
@@ -98,5 +98,24 @@ public class Contact implements Serializable {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Contact) {
+            Contact other = (Contact) obj;
+            return other.id == id && other.firstName.equals(firstName)
+                    && other.lastName.equals(lastName) && other.phoneNumber
+                    .equals(phoneNumber) && other.email.equals(email)
+                    && other.birthDate.equals(birthDate);
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeGenerator(Contact.class).append(id).append(firstName)
+                .append(lastName).append(phoneNumber).append(email)
+                .append(birthDate).getHashCode();
     }
 }
