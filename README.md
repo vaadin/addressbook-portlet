@@ -55,28 +55,12 @@ and `addressbook-bundle/target/vaadin-portlet-static.war` folder to your web ser
 To add a new Portlet module to the project create a default vaadin portlet module.
 The module should contain its own portlet.xml file.
 
-Add to the new module the following plugin:
-````xml
-<plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-antrun-plugin</artifactId>
-    <executions>
-        <execution>
-            <id>copy-files</id>
-            <phase>generate-resources</phase>
-            <goals>
-                <goal>run</goal>
-            </goals>
-            <configuration>
-                <tasks>
-                    <copy todir="${project.build.directory}/classes/META-INF/VAADIN/config">
-                        <fileset dir="../target/META-INF/VAADIN/config" />
-                    </copy>
-                </tasks>
-            </configuration>
-        </execution>
-    </executions>
-</plugin>
+Add to the new module the resource file `flow-build-info.json` into `./src/main/resources/META-INF/VAADIN/config`
+with the contents:
+````json
+{
+  "externalStatsUrl": "/vaadin-portlet-static/VAADIN/config/stats.json"
+}
 ````
 
 Add the module sources to the bundle module `build-helper-maven-plugin` as added sources:

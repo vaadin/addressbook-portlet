@@ -20,7 +20,7 @@
         <javax.validation.version>2.0.0.Final</javax.validation.version>
 
         <vaadin.version>14.1.0.beta1</vaadin.version>
-        <flow.version>2.2.0.alpha3</flow.version>
+        <flow.version>2.2-SNAPSHOT</flow.version>
         <vaadin-portlet.version>1.0.0.alpha4</vaadin-portlet.version>
         <vaadin.productionMode>true</vaadin.productionMode>
 
@@ -28,8 +28,13 @@
     </properties>
 
     <modules>
+        <!-- Backend first as both portlets use it -->
         <module>addressbook-backend</module>
+        <!-- bundle can be build before portlets if sources added -->
+        <!-- If portlets added as dependencies then bundle last -->
         <module>addressbook-bundle</module>
+        <!-- Portlets can be built in any order as they do not have -->
+        <!-- a dependency between them -->
         <module>addressbook-grid</module>
         <module>addressbook-form</module>
     </modules>
@@ -134,69 +139,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        <!--        <plugins>-->
-        <!--            <plugin>-->
-        <!--                <groupId>org.apache.maven.plugins</groupId>-->
-        <!--                <artifactId>maven-compiler-plugin</artifactId>-->
-        <!--                <version>3.8.0</version>-->
-        <!--            </plugin>-->
-        <!--            <plugin>-->
-        <!--                <groupId>org.apache.maven.plugins</groupId>-->
-        <!--                <artifactId>maven-war-plugin</artifactId>-->
-        <!--                <version>3.2.3</version>-->
-        <!--                <configuration>-->
-        <!--                    <archive>-->
-        <!--                        <manifestEntries>-->
-        <!--                            <Implementation-Title>${project.name}-->
-        <!--                            </Implementation-Title>-->
-        <!--                            <Implementation-Version>${project.version}-->
-        <!--                            </Implementation-Version>-->
-        <!--                        </manifestEntries>-->
-        <!--                    </archive>-->
-        <!--                </configuration>-->
-        <!--                &lt;!&ndash; Generate 2 war archives for portlet. One for the portlet and another for the static files &ndash;&gt;-->
-        <!--                <executions>-->
-        <!--                    &lt;!&ndash; Generate a static war 'vaadin-portlet-static.war' with all static files &ndash;&gt;-->
-        <!--                    <execution>-->
-        <!--                        <id>static-files</id>-->
-        <!--                        <goals>-->
-        <!--                            <goal>war</goal>-->
-        <!--                        </goals>-->
-        <!--                        <configuration>-->
-        <!--                            <warName>vaadin-portlet-static</warName>-->
-        <!--                            &lt;!&ndash; static files should contain flow-client and all build files generated in VAADIN/ &ndash;&gt;-->
-        <!--                            <packagingIncludes>WEB-INF/lib/flow-client*.jar,VAADIN/</packagingIncludes>-->
-
-        <!--                            <webResources>-->
-        <!--                                <resource>-->
-        <!--                                    &lt;!&ndash; this is relative to the pom.xml directory &ndash;&gt;-->
-        <!--                                    <directory>target/classes/META-INF/</directory>-->
-        <!--                                    &lt;!&ndash; Include all files and folders below <directory> &ndash;&gt;-->
-        <!--                                    <includes>-->
-        <!--                                        <include>**</include>-->
-        <!--                                    </includes>-->
-        <!--                                    &lt;!&ndash; do not include configuration files &ndash;&gt;-->
-        <!--                                    <excludes>-->
-        <!--                                        <exclude>VAADIN/config/**</exclude>-->
-        <!--                                    </excludes>-->
-        <!--                                </resource>-->
-        <!--                            </webResources>-->
-        <!--                        </configuration>-->
-        <!--                    </execution>-->
-        <!--                    &lt;!&ndash; Generate the portlet war excluding any static build files &ndash;&gt;-->
-        <!--                    <execution>-->
-        <!--                        <id>portlet-war</id>-->
-        <!--                        <goals>-->
-        <!--                            <goal>war</goal>-->
-        <!--                        </goals>-->
-        <!--                        <configuration>-->
-        <!--                            <primaryArtifact>true</primaryArtifact>-->
-        <!--                            <packagingExcludes>WEB-INF/classes/META-INF/VAADIN/build/**,VAADIN/</packagingExcludes>-->
-        <!--                        </configuration>-->
-        <!--                    </execution>-->
-        <!--                </executions>-->
-        <!--            </plugin>-->
-        <!--        </plugins>-->
     </build>
 
     <profiles>
