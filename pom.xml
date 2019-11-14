@@ -30,13 +30,16 @@
     <modules>
         <!-- Backend first as both portlets use it -->
         <module>addressbook-backend</module>
-        <!-- bundle can be build before portlets if sources added -->
-        <!-- If portlets added as dependencies then bundle last -->
-        <module>addressbook-bundle</module>
+
         <!-- Portlets can be built in any order as they do not have -->
         <!-- a dependency between them -->
         <module>addressbook-grid</module>
         <module>addressbook-form</module>
+        <!-- bundle can be build before portlets if sources added -->
+        <!-- If portlets added as dependencies then bundle last -->
+        <module>addressbook-bundle</module>
+
+
     </modules>
 
     <repositories>
