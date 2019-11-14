@@ -35,11 +35,9 @@
         <!-- a dependency between them -->
         <module>addressbook-grid</module>
         <module>addressbook-form</module>
-        <!-- bundle can be build before portlets if sources added -->
-        <!-- If portlets added as dependencies then bundle last -->
+
+        <!-- Depends on portlets, so build as last -->
         <module>addressbook-bundle</module>
-
-
     </modules>
 
     <repositories>
