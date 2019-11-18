@@ -10,7 +10,6 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.vaadin</groupId>
     <artifactId>address-book-static-bundle</artifactId>
     <name>Address book static files bundle</name>
     <packaging>war</packaging>
@@ -55,34 +54,26 @@
             <version>3.0.0</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>address-book-grid</artifactId>
+            <version>${project.version}</version>
+            <classifier>classes</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>address-book-form</artifactId>
+            <version>${project.version}</version>
+            <classifier>classes</classifier>
+        </dependency>
     </dependencies>
 
     <build>
         <finalName>vaadin-portlet-static</finalName>
 
         <plugins>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.7</version>
-                <executions>
-                    <execution>
-                        <id>add-source</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <!-- Add portlet sources so we can generate exported webComponents -->
-                                <source>../addressbook-form/src/main/java</source>
-                                <source>../addressbook-grid/src/main/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>com.vaadin</groupId>
                 <!-- Using Flow plugin instead of Vaadin plugin due to lacking prerelease of Vaadin 14.2 -->
@@ -104,34 +95,24 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <!-- Generate 2 war archives for portlet. One for the portlet and another for the static files -->
-                <executions>
-                    <!-- Generate a static war 'vaadin-portlet-static.war' with all static files -->
-                    <execution>
-                        <goals>
-                            <goal>war</goal>
-                        </goals>
-                        <configuration>
-                            <!-- static files should contain flow-client and all build files generated in VAADIN/ -->
-                            <packagingIncludes>WEB-INF/lib/flow-client*.jar,VAADIN/</packagingIncludes>
-
-                            <webResources>
-                                <resource>
-                                    <!-- this is relative to the pom.xml directory -->
-                                    <directory>target/classes/META-INF/</directory>
-                                    <!-- Include all files and folders below <directory> -->
-                                    <includes>
-                                        <include>**</include>
-                                    </includes>
-                                    <!-- do not include flow-build-info -->
-                                    <excludes>
-                                        <exclude>VAADIN/config/flow-build-info.json</exclude>
-                                    </excludes>
-                                </resource>
-                            </webResources>
-                        </configuration>
-                    </execution>
-                </executions>
+                <configuration>
+                    <!-- static files should contain flow-client and all build files generated in VAADIN/ -->
+                    <packagingIncludes>WEB-INF/lib/flow-client*.jar,VAADIN/</packagingIncludes>
+                    <webResources>
+                        <resource>
+                            <!-- this is relative to the pom.xml directory -->
+                            <directory>target/classes/META-INF/</directory>
+                            <!-- Include all files and folders below <directory> -->
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                            <!-- do not include flow-build-info -->
+                            <excludes>
+                                <exclude>VAADIN/config/flow-build-info.json</exclude>
+                            </excludes>
+                        </resource>
+                    </webResources>
+                </configuration>
             </plugin>
         </plugins>
     </build>

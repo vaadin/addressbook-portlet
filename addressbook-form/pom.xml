@@ -10,7 +10,6 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.vaadin</groupId>
     <artifactId>address-book-form</artifactId>
     <name>Address book form portlet</name>
     <packaging>war</packaging>
@@ -122,10 +121,6 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.0</version>
                 <configuration>
@@ -136,19 +131,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <executions>
-                    <!-- Generate the portlet war excluding any static build files -->
-                    <execution>
-                        <id>portlet-war</id>
-                        <goals>
-                            <goal>war</goal>
-                        </goals>
-                        <configuration>
-                            <primaryArtifact>true</primaryArtifact>
-                            <packagingExcludes>WEB-INF/classes/META-INF/VAADIN/build/**,VAADIN/</packagingExcludes>
-                        </configuration>
-                    </execution>
-                </executions>
+                <configuration>
+                    <attachClasses>true</attachClasses>
+                </configuration>
             </plugin>
         </plugins>
     </build>
