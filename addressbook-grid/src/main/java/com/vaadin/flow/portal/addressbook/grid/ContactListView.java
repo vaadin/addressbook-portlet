@@ -56,13 +56,6 @@ public class ContactListView extends VerticalLayout implements PortletView {
         init();
     }
 
-    private ContactService getService() {
-        if(service == null) {
-            service = new ContactService();
-        }
-        return service;
-    }
-
     private void onContactUpdated(PortletEvent event) {
         int contactId = Integer
                 .parseInt(event.getParameters().get("contactId")[0]);
@@ -73,15 +66,25 @@ public class ContactListView extends VerticalLayout implements PortletView {
 
     private void handleWindowStateChanged(WindowState windowState) {
         if (WindowState.MAXIMIZED.equals(windowState)) {
-            this.windowStateButton.setText("Normalize");
             grid.setColumns("firstName", "lastName", "phoneNumber", "email",
                     "birthDate");
             grid.setMinWidth("700px");
+            this.windowStateButton.setText("Normalize");
         } else if (WindowState.NORMAL.equals(windowState)) {
-            this.windowStateButton.setText("Maximize");
             grid.setColumns("firstName", "lastName", "phoneNumber");
             grid.setMinWidth("450px");
+            this.windowStateButton.setText("Maximize");
         }
+    }
+
+    private void fireSelectionEvent(
+            ItemClickEvent<Contact> contactItemClickEvent) {
+        Integer contactId = contactItemClickEvent.getItem().getId();
+
+        Map<String, String> param = Collections.singletonMap(
+                "contactId", contactId.toString());
+
+        portletViewContext.fireEvent("contact-selected", param);
     }
 
     @Override
@@ -111,14 +114,11 @@ public class ContactListView extends VerticalLayout implements PortletView {
         setHorizontalComponentAlignment(Alignment.END, windowStateButton);
     }
 
-    private void fireSelectionEvent(
-            ItemClickEvent<Contact> contactItemClickEvent) {
-        Integer contactId = contactItemClickEvent.getItem().getId();
-
-        Map<String, String> param = Collections.singletonMap(
-                "contactId", contactId.toString());
-
-        portletViewContext.fireEvent("contact-selected", param);
+    private ContactService getService() {
+        if(service == null) {
+            service = new ContactService();
+        }
+        return service;
     }
 
     private void switchWindowState() {
