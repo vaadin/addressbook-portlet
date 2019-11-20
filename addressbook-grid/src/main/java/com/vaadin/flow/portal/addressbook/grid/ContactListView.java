@@ -33,6 +33,10 @@ import com.vaadin.flow.portal.handler.PortletEvent;
 import com.vaadin.flow.portal.handler.PortletView;
 import com.vaadin.flow.portal.handler.PortletViewContext;
 
+import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.EVENT_CONTACT_SELECTED;
+import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.EVENT_CONTACT_UPDATED;
+import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.KEY_CONTACT_ID;
+
 /**
  * @author Vaadin Ltd
  */
@@ -49,23 +53,16 @@ public class ContactListView extends VerticalLayout implements PortletView {
     @Override
     public void onPortletViewContextInit(PortletViewContext context) {
         portletViewContext = context;
-        context.addEventChangeListener("contact-updated",
+        context.addEventChangeListener(EVENT_CONTACT_UPDATED,
                 this::onContactUpdated);
         context.addWindowStateChangeListener(
                 event -> handleWindowStateChanged(event.getWindowState()));
         init();
     }
 
-    private ContactService getService() {
-        if(service == null) {
-            service = new ContactService();
-        }
-        return service;
-    }
-
     private void onContactUpdated(PortletEvent event) {
         int contactId = Integer
-                .parseInt(event.getParameters().get("contactId")[0]);
+                .parseInt(event.getParameters().get(KEY_CONTACT_ID)[0]);
         Optional<Contact> contact = getService()
                 .findById(contactId);
         contact.ifPresent(value -> dataProvider.refreshItem(value));
@@ -73,15 +70,25 @@ public class ContactListView extends VerticalLayout implements PortletView {
 
     private void handleWindowStateChanged(WindowState windowState) {
         if (WindowState.MAXIMIZED.equals(windowState)) {
-            this.windowStateButton.setText("Normalize");
             grid.setColumns("firstName", "lastName", "phoneNumber", "email",
                     "birthDate");
             grid.setMinWidth("700px");
+            this.windowStateButton.setText("Normalize");
         } else if (WindowState.NORMAL.equals(windowState)) {
-            this.windowStateButton.setText("Maximize");
             grid.setColumns("firstName", "lastName", "phoneNumber");
             grid.setMinWidth("450px");
+            this.windowStateButton.setText("Maximize");
         }
+    }
+
+    private void fireSelectionEvent(
+            ItemClickEvent<Contact> contactItemClickEvent) {
+        Integer contactId = contactItemClickEvent.getItem().getId();
+
+        Map<String, String> param = Collections.singletonMap(
+                KEY_CONTACT_ID, contactId.toString());
+
+        portletViewContext.fireEvent(EVENT_CONTACT_SELECTED, param);
     }
 
     @Override
@@ -111,14 +118,11 @@ public class ContactListView extends VerticalLayout implements PortletView {
         setHorizontalComponentAlignment(Alignment.END, windowStateButton);
     }
 
-    private void fireSelectionEvent(
-            ItemClickEvent<Contact> contactItemClickEvent) {
-        Integer contactId = contactItemClickEvent.getItem().getId();
-
-        Map<String, String> param = Collections.singletonMap(
-                "contactId", contactId.toString());
-
-        portletViewContext.fireEvent("contact-selected", param);
+    private ContactService getService() {
+        if(service == null) {
+            service = new ContactService();
+        }
+        return service;
     }
 
     private void switchWindowState() {

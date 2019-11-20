@@ -37,6 +37,10 @@ import com.vaadin.flow.portal.handler.PortletModeEvent;
 import com.vaadin.flow.portal.handler.PortletView;
 import com.vaadin.flow.portal.handler.PortletViewContext;
 
+import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.EVENT_CONTACT_SELECTED;
+import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.EVENT_CONTACT_UPDATED;
+import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.KEY_CONTACT_ID;
+
 /**
  * @author Vaadin Ltd
  */
@@ -46,31 +50,63 @@ public class ContactFormView extends VerticalLayout implements PortletView {
     private static final String ACTION_CREATE = "Create new";
     private static final String ACTION_SAVE = "Save";
 
+    private PortletViewContext portletViewContext;
+
     private Binder<Contact> binder;
-    private Image image;
     private Contact contact;
+
     private Button action;
     private Button cancel;
     private Button remove;
-
-    private PortletViewContext portletViewContext;
+    private Image image;
 
     private ContactService service;
 
     @Override
     public void onPortletViewContextInit(PortletViewContext context) {
         this.portletViewContext = context;
-        context.addEventChangeListener("contact-selected",
+        context.addEventChangeListener(EVENT_CONTACT_SELECTED,
                 this::onContactSelected);
         context.addPortletModeChangeListener(this::handlePortletModeChange);
         init();
     }
 
-    private ContactService getService() {
-        if (service == null) {
-            service = new ContactService();
+    private void onContactSelected(PortletEvent event) {
+        int contactId = Integer
+                .parseInt(event.getParameters().get(KEY_CONTACT_ID)[0]);
+        Optional<Contact> contact = getService().findById(contactId);
+        if (contact.isPresent()) {
+            this.contact = contact.get();
+            updateActionText();
+            binder.readBean(this.contact);
+            if (this.contact.getImage() != null) {
+                image.setSrc(this.contact.getImage());
+                image.setVisible(true);
+            }
+            remove.setVisible(true);
+        } else {
+            clear();
         }
-        return service;
+    }
+
+    private void handlePortletModeChange(PortletModeEvent event) {
+        binder.setReadOnly(event.isViewMode());
+        if (event.isViewMode()) {
+            action.setText(ACTION_EDIT);
+        } else {
+            action.setText(ACTION_SAVE);
+        }
+    }
+
+    private void fireUpdateEvent(Contact contact) {
+        Map<String, String> param = Collections
+                .singletonMap(KEY_CONTACT_ID, contact.getId().toString());
+
+        portletViewContext.fireEvent(EVENT_CONTACT_UPDATED, param);
+    }
+
+    private PortletMode getPortletMode() {
+        return portletViewContext.getPortletMode();
     }
 
     private void init() {
@@ -83,8 +119,11 @@ public class ContactFormView extends VerticalLayout implements PortletView {
         setHorizontalComponentAlignment(Alignment.END, actionButtons);
     }
 
-    private PortletMode getPortletMode() {
-        return portletViewContext.getPortletMode();
+    private ContactService getService() {
+        if (service == null) {
+            service = new ContactService();
+        }
+        return service;
     }
 
     private FormLayout populateFormLayout() {
@@ -143,24 +182,6 @@ public class ContactFormView extends VerticalLayout implements PortletView {
                 contact == null ? ACTION_CREATE : ACTION_EDIT);
     }
 
-    private void onContactSelected(PortletEvent event) {
-        int contactId = Integer
-                .parseInt(event.getParameters().get("contactId")[0]);
-        Optional<Contact> contact = getService().findById(contactId);
-        if (contact.isPresent()) {
-            this.contact = contact.get();
-            updateActionText();
-            binder.readBean(this.contact);
-            if (this.contact.getImage() != null) {
-                image.setSrc(this.contact.getImage());
-                image.setVisible(true);
-            }
-            remove.setVisible(true);
-        } else {
-            clear();
-        }
-    }
-
     private void clear() {
         contact = null;
         cancel();
@@ -198,31 +219,15 @@ public class ContactFormView extends VerticalLayout implements PortletView {
         if (contact != null) {
             binder.writeBeanIfValid(contact);
             getService().save(contact);
-            fireUpdateEvent(contact);
         } else {
             contact = new Contact(getService().getNextId());
             binder.writeBeanIfValid(contact);
             getService().create(contact);
-            fireUpdateEvent(contact);
         }
+        fireUpdateEvent(contact);
         updateActionText();
 
         portletViewContext.setPortletMode(PortletMode.VIEW);
     }
 
-    private void fireUpdateEvent(Contact contact) {
-        Map<String, String> param = Collections
-                .singletonMap("contactId", contact.getId().toString());
-
-        portletViewContext.fireEvent("contact-updated", param);
-    }
-
-    private void handlePortletModeChange(PortletModeEvent event) {
-        binder.setReadOnly(PortletMode.VIEW.equals(event.getPortletMode()));
-        if (event.isEditMode()) {
-            action.setText(ACTION_SAVE);
-        } else {
-            action.setText(ACTION_EDIT);
-        }
-    }
 }
