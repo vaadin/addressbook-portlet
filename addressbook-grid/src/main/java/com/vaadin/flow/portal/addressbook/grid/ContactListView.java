@@ -33,6 +33,10 @@ import com.vaadin.flow.portal.handler.PortletEvent;
 import com.vaadin.flow.portal.handler.PortletView;
 import com.vaadin.flow.portal.handler.PortletViewContext;
 
+import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.EVENT_CONTACT_SELECTED;
+import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.EVENT_CONTACT_UPDATED;
+import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.KEY_CONTACT_ID;
+
 /**
  * @author Vaadin Ltd
  */
@@ -49,7 +53,7 @@ public class ContactListView extends VerticalLayout implements PortletView {
     @Override
     public void onPortletViewContextInit(PortletViewContext context) {
         portletViewContext = context;
-        context.addEventChangeListener("contact-updated",
+        context.addEventChangeListener(EVENT_CONTACT_UPDATED,
                 this::onContactUpdated);
         context.addWindowStateChangeListener(
                 event -> handleWindowStateChanged(event.getWindowState()));
@@ -58,7 +62,7 @@ public class ContactListView extends VerticalLayout implements PortletView {
 
     private void onContactUpdated(PortletEvent event) {
         int contactId = Integer
-                .parseInt(event.getParameters().get("contactId")[0]);
+                .parseInt(event.getParameters().get(KEY_CONTACT_ID)[0]);
         Optional<Contact> contact = getService()
                 .findById(contactId);
         contact.ifPresent(value -> dataProvider.refreshItem(value));
@@ -82,9 +86,9 @@ public class ContactListView extends VerticalLayout implements PortletView {
         Integer contactId = contactItemClickEvent.getItem().getId();
 
         Map<String, String> param = Collections.singletonMap(
-                "contactId", contactId.toString());
+                KEY_CONTACT_ID, contactId.toString());
 
-        portletViewContext.fireEvent("contact-selected", param);
+        portletViewContext.fireEvent(EVENT_CONTACT_SELECTED, param);
     }
 
     @Override
