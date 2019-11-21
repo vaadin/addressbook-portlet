@@ -19,8 +19,8 @@
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <javax.validation.version>2.0.0.Final</javax.validation.version>
 
-        <vaadin.version>14.1.0.beta1</vaadin.version>
-        <flow.version>2.2.0.alpha4</flow.version>
+        <vaadin.version>14.1.0.beta3</vaadin.version>
+        <flow.version>2.2.0.alpha5</flow.version>
         <vaadin-portlet.version>1.0.0.alpha4</vaadin-portlet.version>
         <vaadin.productionMode>true</vaadin.productionMode>
 
@@ -84,6 +84,60 @@
                 <version>${vaadin.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <!-- Replace artifactId with vaadin-core to use only free components -->
+                <artifactId>vaadin</artifactId>
+                <version>${vaadin.version}</version>
+                <exclusions>
+                    <!-- Webjars are only needed when running in Vaadin 13 compatibility mode -->
+                    <exclusion>
+                        <groupId>com.vaadin.webjar</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.webjars.bowergithub.insites</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.webjars.bowergithub.polymer</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.webjars.bowergithub.polymerelements</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.webjars.bowergithub.vaadin</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.webjars.bowergithub.webcomponents</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-portlet</artifactId>
+                <version>${vaadin-portlet.version}</version>
+            </dependency>
+            <!-- remove these once 14.2 pre-release is out: -->
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>flow-data</artifactId>
+                <version>${flow.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>flow-server</artifactId>
+                <version>${flow.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>flow-client</artifactId>
+                <version>${flow.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
