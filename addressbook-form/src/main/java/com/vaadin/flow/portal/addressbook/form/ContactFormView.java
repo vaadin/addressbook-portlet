@@ -16,6 +16,7 @@
 package com.vaadin.flow.portal.addressbook.form;
 
 import javax.portlet.PortletMode;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -30,12 +31,12 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.portal.PortletView;
+import com.vaadin.flow.portal.PortletViewContext;
 import com.vaadin.flow.portal.addressbook.backend.Contact;
 import com.vaadin.flow.portal.addressbook.backend.ContactService;
-import com.vaadin.flow.portal.handler.PortletEvent;
-import com.vaadin.flow.portal.handler.PortletModeEvent;
-import com.vaadin.flow.portal.handler.PortletView;
-import com.vaadin.flow.portal.handler.PortletViewContext;
+import com.vaadin.flow.portal.lifecycle.PortletEvent;
+import com.vaadin.flow.portal.lifecycle.PortletModeEvent;
 
 import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.EVENT_CONTACT_SELECTED;
 import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.EVENT_CONTACT_UPDATED;
@@ -99,8 +100,8 @@ public class ContactFormView extends VerticalLayout implements PortletView {
     }
 
     private void fireUpdateEvent(Contact contact) {
-        Map<String, String> param = Collections
-                .singletonMap(KEY_CONTACT_ID, contact.getId().toString());
+        Map<String, String> param = Collections.singletonMap(KEY_CONTACT_ID,
+                contact.getId().toString());
 
         portletViewContext.fireEvent(EVENT_CONTACT_UPDATED, param);
     }
@@ -177,9 +178,8 @@ public class ContactFormView extends VerticalLayout implements PortletView {
     }
 
     private void updateActionText() {
-        action.setText(PortletMode.EDIT.equals(getPortletMode()) ?
-                ACTION_SAVE :
-                contact == null ? ACTION_CREATE : ACTION_EDIT);
+        action.setText(PortletMode.EDIT.equals(getPortletMode()) ? ACTION_SAVE
+                : contact == null ? ACTION_CREATE : ACTION_EDIT);
     }
 
     private void clear() {
