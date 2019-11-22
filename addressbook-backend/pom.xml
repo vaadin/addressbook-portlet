@@ -10,7 +10,6 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.vaadin</groupId>
     <artifactId>address-book-backend</artifactId>
     <name>Address book backend</name>
     <packaging>jar</packaging>
@@ -19,7 +18,6 @@
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>flow-server</artifactId>
-            <version>${flow.version}</version>
         </dependency>
 
         <dependency>
