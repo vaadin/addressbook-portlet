@@ -10,7 +10,6 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.vaadin</groupId>
     <artifactId>portal-module</artifactId>
     <name>portal-module</name>
     <packaging>pom</packaging>
@@ -19,7 +18,6 @@
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>flow-server-production-mode</artifactId>
-            <version>${flow.version}</version>
         </dependency>
     </dependencies>
     <profiles>

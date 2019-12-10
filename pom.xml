@@ -19,8 +19,7 @@
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <javax.validation.version>2.0.0.Final</javax.validation.version>
 
-        <vaadin.version>14.1.0.beta3</vaadin.version>
-        <flow.version>2.2.0.alpha6</flow.version>
+        <vaadin.version>14.2.0.alpha1</vaadin.version>
         <vaadin-portlet.version>1.0.0.beta1</vaadin-portlet.version>
         <vaadin.productionMode>true</vaadin.productionMode>
 
@@ -123,22 +122,6 @@
                 <artifactId>vaadin-portlet</artifactId>
                 <version>${vaadin-portlet.version}</version>
             </dependency>
-            <!-- remove these once 14.2 pre-release is out: -->
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>flow-data</artifactId>
-                <version>${flow.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>flow-server</artifactId>
-                <version>${flow.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>flow-client</artifactId>
-                <version>${flow.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -211,8 +194,8 @@
                 <plugins>
                     <plugin>
                         <groupId>com.vaadin</groupId>
-                        <!-- Using Flow plugin instead of Vaadin plugin due to lacking prerelease of Vaadin 14.2 -->
-                        <artifactId>flow-maven-plugin</artifactId>
+                        <artifactId>vaadin-maven-plugin</artifactId>
+                        <version>${vaadin.version}</version>
                         <executions>
                             <execution>
                                 <goals>
@@ -274,4 +257,3 @@
         </profile>
     </profiles>
 </project>
-
