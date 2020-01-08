@@ -33,8 +33,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.slf4j.LoggerFactory;
+
+import com.vaadin.flow.data.provider.Query;
 
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
@@ -52,7 +55,8 @@ public class ContactService {
      */
     public ContactService() {
         try {
-            // This is for pluto as it seems to not find the driver class if not explicitly loaded
+            // This is for pluto as it seems to not find the driver class if not
+            // explicitly loaded
             Class.forName("org.sqlite.JDBC");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -66,16 +70,17 @@ public class ContactService {
                 UsersUtil.getRandomUsers(20, "contacts").ifPresent(result -> {
                     JsonArray results = result.getArray("results");
                     for (int i = 0; i < results.length(); i++) {
-                        Contact contact = new Contact(i+1);
+                        Contact contact = new Contact(i + 1);
                         JsonObject json = results.getObject(i);
                         contact.setFirstName(
                                 json.getObject("name").getString("first"));
                         contact.setLastName(
                                 json.getObject("name").getString("last"));
-                        contact.setBirthDate(LocalDateTime.ofInstant(
-                                Instant.parse(json.getObject("dob")
-                                        .getString("date")),
-                                ZoneId.of(ZoneOffset.UTC.getId()))
+                        contact.setBirthDate(LocalDateTime
+                                .ofInstant(
+                                        Instant.parse(json.getObject("dob")
+                                                .getString("date")),
+                                        ZoneId.of(ZoneOffset.UTC.getId()))
                                 .toLocalDate());
                         contact.setEmail(json.getString("email"));
                         contact.setPhoneNumber(json.getString("phone"));
@@ -96,14 +101,14 @@ public class ContactService {
      */
     public int getContactsCount() {
         int contacts = 0;
-        try (Connection conn = connect(); Statement stmt = conn
-                .createStatement()) {
+        try (Connection conn = connect();
+                Statement stmt = conn.createStatement()) {
             ResultSet resultSet = stmt
                     .executeQuery("SELECT COUNT(*) AS total FROM contacts");
             contacts = resultSet.getInt("total");
         } catch (SQLException e) {
-            LoggerFactory.getLogger(getClass())
-                    .error("Failed to get contacts", e);
+            LoggerFactory.getLogger(getClass()).error("Failed to get contacts",
+                    e);
         }
         return contacts;
     }
@@ -116,8 +121,8 @@ public class ContactService {
      */
     public int getNextId() {
         int nextId = 0;
-        try (Connection conn = connect(); Statement stmt = conn
-                .createStatement()) {
+        try (Connection conn = connect();
+                Statement stmt = conn.createStatement()) {
             ResultSet resultSet = stmt
                     .executeQuery("SELECT MAX(id) AS total FROM contacts");
             nextId = resultSet.getInt("total") + 1;
@@ -135,15 +140,15 @@ public class ContactService {
      */
     public Collection<Contact> getContacts() {
         List<Contact> contacts = new ArrayList<>();
-        try (Connection conn = connect(); Statement stmt = conn
-                .createStatement()) {
+        try (Connection conn = connect();
+                Statement stmt = conn.createStatement()) {
             ResultSet resultSet = stmt.executeQuery("SELECT * FROM contacts;");
             while (resultSet.next()) {
                 contacts.add(new Contact(resultSet));
             }
         } catch (SQLException e) {
-            LoggerFactory.getLogger(getClass())
-                    .error("Failed to get contacts", e);
+            LoggerFactory.getLogger(getClass()).error("Failed to get contacts",
+                    e);
         }
         return contacts;
     }
@@ -152,19 +157,19 @@ public class ContactService {
      * Get a contact by id from the database.
      *
      * @param contactId
-     *         id of contact to fetch
+     *            id of contact to fetch
      * @return contact for id or empty if none found
      */
     public Optional<Contact> findById(int contactId) {
         Contact contact = null;
         String sql = "SELECT * FROM contacts WHERE id='" + contactId + "';";
-        try (Connection conn = connect(); Statement stmt = conn
-                .createStatement()) {
+        try (Connection conn = connect();
+                Statement stmt = conn.createStatement()) {
             ResultSet resultSet = stmt.executeQuery(sql);
             contact = new Contact(resultSet);
         } catch (SQLException e) {
-            LoggerFactory.getLogger(getClass())
-                    .error("Failed to get contacts", e);
+            LoggerFactory.getLogger(getClass()).error("Failed to get contacts",
+                    e);
         }
         return Optional.ofNullable(contact);
     }
@@ -173,14 +178,14 @@ public class ContactService {
      * Update contents for an existing contact.
      *
      * @param contact
-     *         contact to update details for, not <code>null</code>
+     *            contact to update details for, not <code>null</code>
      */
     public void save(Contact contact) {
         Objects.requireNonNull(contact);
         String insert = "UPDATE contacts SET firstName = ?,lastName = ?,phoneNumber = ?,email = ?,birthDate = ?,imageUrl = ? WHERE id = ?";
 
-        try (Connection conn = connect(); PreparedStatement pstmt = conn
-                .prepareStatement(insert)) {
+        try (Connection conn = connect();
+                PreparedStatement pstmt = conn.prepareStatement(insert)) {
             pstmt.setString(1, contact.getFirstName());
             pstmt.setString(2, contact.getLastName());
             pstmt.setString(3, contact.getPhoneNumber());
@@ -190,25 +195,24 @@ public class ContactService {
             pstmt.setInt(7, contact.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            LoggerFactory.getLogger(getClass())
-                    .error("Failed to insert contact due to '{}'",
-                            e.getMessage(), e);
+            LoggerFactory.getLogger(getClass()).error(
+                    "Failed to insert contact due to '{}'", e.getMessage(), e);
         }
     }
 
     /**
-     * Create a new contact row into the database.
-     * Will throw an exception if 'id' already exists in the database.
+     * Create a new contact row into the database. Will throw an exception if
+     * 'id' already exists in the database.
      *
      * @param contact
-     *         contact to add to database, not <code>null</code>
+     *            contact to add to database, not <code>null</code>
      */
     public void create(Contact contact) {
         Objects.requireNonNull(contact);
         String insert = "INSERT INTO contacts(id,firstName,lastName,phoneNumber,email,birthDate,imageUrl) VALUES(?,?,?,?,?,?,?)";
 
-        try (Connection conn = connect(); PreparedStatement pstmt = conn
-                .prepareStatement(insert)) {
+        try (Connection conn = connect();
+                PreparedStatement pstmt = conn.prepareStatement(insert)) {
             pstmt.setInt(1, contact.getId());
             pstmt.setString(2, contact.getFirstName());
             pstmt.setString(3, contact.getLastName());
@@ -218,27 +222,27 @@ public class ContactService {
             pstmt.setString(7, contact.getImage());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            LoggerFactory.getLogger(getClass())
-                    .error("Failed to insert contact due to '{}'",
-                            e.getMessage(), e);
+            LoggerFactory.getLogger(getClass()).error(
+                    "Failed to insert contact due to '{}'", e.getMessage(), e);
         }
     }
 
     /**
      * Remove a contact row from the database.
-     * @param contact contact to remove, not <code>null</code>
+     *
+     * @param contact
+     *            contact to remove, not <code>null</code>
      */
     public void remove(Contact contact) {
         Objects.requireNonNull(contact);
         String remove = "DELETE FROM contacts WHERE id = ?";
-        try (Connection conn = connect(); PreparedStatement pstmt = conn
-                .prepareStatement(remove)) {
+        try (Connection conn = connect();
+                PreparedStatement pstmt = conn.prepareStatement(remove)) {
             pstmt.setInt(1, contact.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            LoggerFactory.getLogger(getClass())
-                    .error("Failed to remove contact due to '{}'",
-                            e.getMessage(), e);
+            LoggerFactory.getLogger(getClass()).error(
+                    "Failed to remove contact due to '{}'", e.getMessage(), e);
         }
     }
 
@@ -280,8 +284,8 @@ public class ContactService {
 
         String url = "jdbc:sqlite:" + dbFile;
 
-        try (Connection conn = DriverManager
-                .getConnection(url); Statement stmt = conn.createStatement()) {
+        try (Connection conn = DriverManager.getConnection(url);
+                Statement stmt = conn.createStatement()) {
             StringBuilder initScript = new StringBuilder();
             initScript.append("CREATE TABLE IF NOT EXISTS ")
                     .append("contacts (");
@@ -297,5 +301,28 @@ public class ContactService {
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to init database.", e);
         }
+    }
+
+    public Stream<Contact> getContacts(
+            com.vaadin.flow.data.provider.Query<Contact, Void> query) {
+        List<Contact> contacts = new ArrayList<>();
+        try (Connection conn = connect();
+                Statement stmt = conn.createStatement()) {
+            String sql = String.format(
+                    "SELECT * FROM contacts LIMIT %d OFFSET %d;",
+                    query.getLimit(), query.getOffset());
+            ResultSet resultSet = stmt.executeQuery(sql);
+            while (resultSet.next()) {
+                contacts.add(new Contact(resultSet));
+            }
+        } catch (SQLException e) {
+            LoggerFactory.getLogger(getClass()).error("Failed to get contacts",
+                    e);
+        }
+        return contacts.stream();
+    }
+
+    public int getContactsCount(Query<Contact, Void> query) {
+        return getContactsCount();
     }
 }
