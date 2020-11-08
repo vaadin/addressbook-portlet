@@ -20,12 +20,12 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.ItemClickEvent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.provider.CallbackDataProvider;
+import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.portal.PortletView;
 import com.vaadin.flow.portal.PortletViewContext;
 import com.vaadin.flow.portal.addressbook.backend.Contact;
@@ -41,7 +41,7 @@ import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.K
  */
 public class ContactListView extends VerticalLayout implements PortletView {
 
-    private ListDataProvider<Contact> dataProvider;
+    private DataProvider<Contact, Void> dataProvider;
 
     private Grid<Contact> grid = new Grid<>(Contact.class);
     private Button windowStateButton;
@@ -62,8 +62,7 @@ public class ContactListView extends VerticalLayout implements PortletView {
     private void onContactUpdated(PortletEvent event) {
         int contactId = Integer
                 .parseInt(event.getParameters().get(KEY_CONTACT_ID)[0]);
-        Optional<Contact> contact = getService()
-                .findById(contactId);
+        Optional<Contact> contact = getService().findById(contactId);
         contact.ifPresent(value -> dataProvider.refreshItem(value));
     }
 
@@ -84,24 +83,18 @@ public class ContactListView extends VerticalLayout implements PortletView {
             ItemClickEvent<Contact> contactItemClickEvent) {
         Integer contactId = contactItemClickEvent.getItem().getId();
 
-        Map<String, String> param = Collections.singletonMap(
-                KEY_CONTACT_ID, contactId.toString());
+        Map<String, String> param = Collections.singletonMap(KEY_CONTACT_ID,
+                contactId.toString());
 
         portletViewContext.fireEvent(EVENT_CONTACT_SELECTED, param);
-    }
-
-    @Override
-    protected void onAttach(AttachEvent attachEvent) {
-        dataProvider = new ListDataProvider<>(
-            getService().getContacts());
-        grid.setDataProvider(dataProvider);
     }
 
     private void init() {
         setWidthFull();
 
-        dataProvider = new ListDataProvider<>(
-                getService().getContacts());
+        dataProvider = new CallbackDataProvider<Contact, Void>(
+                getService()::getContacts, getService()::getContactsCount,
+                Contact::getId);
 
         grid.setDataProvider(dataProvider);
         grid.removeColumnByKey("id");
@@ -118,7 +111,7 @@ public class ContactListView extends VerticalLayout implements PortletView {
     }
 
     private ContactService getService() {
-        if(service == null) {
+        if (service == null) {
             service = new ContactService();
         }
         return service;
