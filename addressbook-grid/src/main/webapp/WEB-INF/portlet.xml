@@ -19,6 +19,10 @@
             <short-title>Contacts</short-title>
             <keywords></keywords>
         </portlet-info>
+        <container-runtime-option>
+            <name>javax.portlet.renderHeaders</name>
+            <value>true</value>
+        </container-runtime-option>
     </portlet>
 
 </portlet-app>
