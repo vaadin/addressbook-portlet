@@ -27,6 +27,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -36,6 +37,8 @@ import com.vaadin.flow.portal.addressbook.backend.Contact;
 import com.vaadin.flow.portal.addressbook.backend.ContactService;
 import com.vaadin.flow.portal.lifecycle.PortletEvent;
 import com.vaadin.flow.portal.lifecycle.PortletModeEvent;
+import com.vaadin.flow.shared.communication.PushMode;
+import com.vaadin.flow.shared.ui.Transport;
 
 import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.EVENT_CONTACT_SELECTED;
 import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.EVENT_CONTACT_UPDATED;

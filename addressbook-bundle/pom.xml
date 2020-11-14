@@ -88,7 +88,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <!-- static files should contain flow-client and all build files generated in VAADIN/ -->
-                    <packagingIncludes>WEB-INF/lib/flow-client*.jar,VAADIN/
+                    <packagingIncludes>WEB-INF/classes/**/*.class,WEB-INF/*.xml,WEB-INF/lib/flow-client*.jar,VAADIN/
                     </packagingIncludes>
                     <webResources>
                         <resource>

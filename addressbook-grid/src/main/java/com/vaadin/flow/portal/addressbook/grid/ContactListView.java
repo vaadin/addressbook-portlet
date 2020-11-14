@@ -24,6 +24,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.ItemClickEvent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.portal.PortletView;
@@ -31,6 +32,8 @@ import com.vaadin.flow.portal.PortletViewContext;
 import com.vaadin.flow.portal.addressbook.backend.Contact;
 import com.vaadin.flow.portal.addressbook.backend.ContactService;
 import com.vaadin.flow.portal.lifecycle.PortletEvent;
+import com.vaadin.flow.shared.communication.PushMode;
+import com.vaadin.flow.shared.ui.Transport;
 
 import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.EVENT_CONTACT_SELECTED;
 import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.EVENT_CONTACT_UPDATED;

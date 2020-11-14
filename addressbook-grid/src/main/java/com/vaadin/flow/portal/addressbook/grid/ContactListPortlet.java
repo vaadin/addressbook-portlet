@@ -15,10 +15,17 @@
  */
 package com.vaadin.flow.portal.addressbook.grid;
 
-import com.vaadin.flow.portal.VaadinPortlet;
+import javax.portlet.annotations.Dependency;
+import javax.portlet.annotations.PortletConfiguration;
+
+import com.vaadin.flow.portal.VaadinLiferayPortlet;
 
 /**
  * @author Vaadin Ltd
  */
-public class ContactListPortlet extends VaadinPortlet<ContactListView> {
+@PortletConfiguration(
+    portletName = "ContactList",
+    dependencies = @Dependency(name = "PortletHub", scope = "javax.portlet", version = "3.0.0")
+)
+public class ContactListPortlet extends VaadinLiferayPortlet<ContactListView> {
 }
