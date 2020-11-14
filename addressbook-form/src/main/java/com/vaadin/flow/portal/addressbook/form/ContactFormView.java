@@ -15,10 +15,11 @@
  */
 package com.vaadin.flow.portal.addressbook.form;
 
-import javax.portlet.PortletMode;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.portlet.PortletMode;
 
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
@@ -27,7 +28,6 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -35,14 +35,9 @@ import com.vaadin.flow.portal.PortletView;
 import com.vaadin.flow.portal.PortletViewContext;
 import com.vaadin.flow.portal.addressbook.backend.Contact;
 import com.vaadin.flow.portal.addressbook.backend.ContactService;
+import com.vaadin.flow.portal.addressbook.backend.PortletEventConstants;
 import com.vaadin.flow.portal.lifecycle.PortletEvent;
 import com.vaadin.flow.portal.lifecycle.PortletModeEvent;
-import com.vaadin.flow.shared.communication.PushMode;
-import com.vaadin.flow.shared.ui.Transport;
-
-import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.EVENT_CONTACT_SELECTED;
-import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.EVENT_CONTACT_UPDATED;
-import static com.vaadin.flow.portal.addressbook.backend.PortletEventConstants.KEY_CONTACT_ID;
 
 /**
  * @author Vaadin Ltd
@@ -68,7 +63,7 @@ public class ContactFormView extends VerticalLayout implements PortletView {
     @Override
     public void onPortletViewContextInit(PortletViewContext context) {
         this.portletViewContext = context;
-        context.addEventChangeListener(EVENT_CONTACT_SELECTED,
+        context.addEventChangeListener(PortletEventConstants.EVENT_CONTACT_SELECTED,
                 this::onContactSelected);
         context.addPortletModeChangeListener(this::handlePortletModeChange);
         init();
@@ -76,7 +71,7 @@ public class ContactFormView extends VerticalLayout implements PortletView {
 
     private void onContactSelected(PortletEvent event) {
         int contactId = Integer
-                .parseInt(event.getParameters().get(KEY_CONTACT_ID)[0]);
+                .parseInt(event.getParameters().get(PortletEventConstants.KEY_CONTACT_ID)[0]);
         Optional<Contact> contact = getService().findById(contactId);
         if (contact.isPresent()) {
             this.contact = contact.get();
@@ -103,9 +98,14 @@ public class ContactFormView extends VerticalLayout implements PortletView {
 
     private void fireUpdateEvent(Contact contact) {
         Map<String, String> param = Collections
-                .singletonMap(KEY_CONTACT_ID, contact.getId().toString());
+                .singletonMap(PortletEventConstants.KEY_CONTACT_ID, contact.getId().toString());
 
-        portletViewContext.fireEvent(EVENT_CONTACT_UPDATED, param);
+        portletViewContext.fireEvent(PortletEventConstants.EVENT_CONTACT_UPDATED, param);
+    }
+
+    private void fireListChangedEvent() {
+        portletViewContext.fireEvent(PortletEventConstants.EVENT_CONTACT_LIST_CHANGED,
+            Collections.emptyMap());
     }
 
     private PortletMode getPortletMode() {
@@ -214,6 +214,7 @@ public class ContactFormView extends VerticalLayout implements PortletView {
             contact = null;
             cancel();
             portletViewContext.setPortletMode(PortletMode.VIEW);
+            fireListChangedEvent();
         }
         updateActionText();
     }
@@ -222,12 +223,13 @@ public class ContactFormView extends VerticalLayout implements PortletView {
         if (contact != null) {
             binder.writeBeanIfValid(contact);
             getService().save(contact);
+            fireUpdateEvent(contact);
         } else {
             contact = new Contact(getService().getNextId());
             binder.writeBeanIfValid(contact);
             getService().create(contact);
+            fireListChangedEvent();
         }
-        fireUpdateEvent(contact);
         updateActionText();
 
         portletViewContext.setPortletMode(PortletMode.VIEW);
