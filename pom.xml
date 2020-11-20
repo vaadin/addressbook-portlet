@@ -19,8 +19,8 @@
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <javax.validation.version>2.0.0.Final</javax.validation.version>
 
-        <vaadin.version>14.2-SNAPSHOT</vaadin.version>
-        <flow.version>2.2-SNAPSHOT</flow.version>
+        <vaadin.version>14.4-SNAPSHOT</vaadin.version>
+        <flow.version>2.4-SNAPSHOT</flow.version>
         <vaadin-portlet.version>1.0-SNAPSHOT</vaadin-portlet.version>
         <vaadin.productionMode>true</vaadin.productionMode>
 

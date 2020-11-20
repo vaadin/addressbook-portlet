@@ -78,6 +78,7 @@
                         </goals>
                         <configuration>
                             <productionMode>true</productionMode>
+                            <compatibilityMode>false</compatibilityMode>
                             <optimizeBundle>false</optimizeBundle>
                         </configuration>
                     </execution>
