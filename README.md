@@ -22,6 +22,8 @@ version: "2.2"
 services:
     liferay-dev:
         image: liferay/portal:7.2.1-ga2
+        environment:
+            - LIFERAY_JAVASCRIPT_PERIOD_SINGLE_PERIOD_PAGE_PERIOD_APPLICATION_PERIOD_ENABLED=false
         ports:
             - 8080:8080
             - 8000:8000
@@ -115,9 +117,9 @@ Vaadin portlet is first added to a page or when the page is being edited. Reload
 publishing the page will resolve the issue (depending on exact Liferay version).
 * When impersonating users in Liferay 7.2 the portlets consistently
 render as blank (empty `vaadin-vertical-layout` web component in DOM).
-* Some javascript methods can get called by Vaadin frontend code on an
-undefined `$server` object when navigating to, or within, the same page multiple times repeatedly 
-(portlets also render blank similar to other two issues).
+* Liferay partial page updates cause Vaadin portlets to render blank, if the browser has stale Vaadin client
+side data (i.e. the previous page also had a vaadin portlet) in its js globals.
+  * This issue can currently be avoided if `javascript.single.page.application.enabled=false` is set portal wide
 * Benign exception about not being able to detect websocket support during deployment of .war files from 
 Atmosphere (ServerContainer is null), Vaadin features reliant on WebSockets may not work.
 
