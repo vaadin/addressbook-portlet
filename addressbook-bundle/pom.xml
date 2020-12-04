@@ -78,6 +78,7 @@
                         </goals>
                         <configuration>
                             <productionMode>true</productionMode>
+                            <compatibilityMode>false</compatibilityMode>
                             <optimizeBundle>false</optimizeBundle>
                         </configuration>
                     </execution>
@@ -87,8 +88,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
-                    <!-- static files should contain flow-client and all build files generated in VAADIN/ -->
-                    <packagingIncludes>WEB-INF/lib/flow-client*.jar,VAADIN/
+                    <!-- static files should contain vaadin-portlet, flow-client and all build files generated in VAADIN/ -->
+                    <packagingIncludes>WEB-INF/classes/**/*.class,WEB-INF/*.xml,WEB-INF/lib/flow-client*.jar,WEB-INF/lib/vaadin-portlet*.jar,VAADIN/
                     </packagingIncludes>
                     <webResources>
                         <resource>
