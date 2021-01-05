@@ -7,6 +7,8 @@ The documentation for Vaadin Portlet support is available [here](https://github.
 
 ## Running the portlet under Liferay
 
+Note: Currently you'll need a local build of the Portlet add-on, from the `feature/liferay` branch. To install a snapshot build to your local Maven repository, execute `git clone --single-branch --branch feature/liferay https://github.com/vaadin/portlet.git; cd portlet; mvn install -DskipTests=true`
+
 Before the portlet application can be run, it must be deployed to a portal for this
 branch the portal supported is [Liferay](https://www.liferay.com/downloads-community).
 
