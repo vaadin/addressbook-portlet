@@ -19,7 +19,7 @@
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <javax.validation.version>2.0.0.Final</javax.validation.version>
 
-        <vaadin.version>14.2.0.alpha2</vaadin.version>
+        <vaadin.version>20.0.0.alpha7</vaadin.version>
         <vaadin-portlet.version>1.0.0.beta3</vaadin-portlet.version>
         <vaadin.productionMode>true</vaadin.productionMode>
 
