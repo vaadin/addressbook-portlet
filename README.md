@@ -7,14 +7,12 @@ The documentation for Vaadin Portlet support is available [here](https://github.
 
 ## Running the portlet under Liferay
 
-Note: Currently you'll need a local build of the Portlet add-on, from the `feature/liferay` branch. To install a snapshot build to your local Maven repository, execute `git clone --single-branch --branch feature/liferay https://github.com/vaadin/portlet.git; cd portlet; mvn install -DskipTests=true`
-
 Before the portlet application can be run, it must be deployed to a portal for this
-branch the portal supported is [Liferay](https://www.liferay.com/downloads-community).
+branch the portal supported is [Liferay](https://www.liferay.com/downloads-community):
 
-First build the whole project using `mvn install` in the root
+1. Build the whole project using `mvn install` in the root
 
-We assume Liferay is running in http://localhost:8080/, an easy way to run a local
+2. We assume Liferay is running in http://localhost:8080/, an easy way to run a local
 copy of Liferay is to use their official [docker images](https://hub.docker.com/r/liferay/portal). 
 Below is an example of a docker-compose file you can use (note the used Liferay version, 7.2+ should
 work).
@@ -34,7 +32,7 @@ services:
             - ./files:/mnt/liferay/files
 ````
 
-Add the following to the end of the last line in Tomcat's `setenv.sh`
+3. Add the following to the end of the last line in Tomcat's `setenv.sh`
 (`/var/liferay/tomcat-<version>/bin`) before starting Liferay. When
 using the above docker-compose file place an edited copy of `setenv.sh`
 in `./files/tomcat/bin`.
@@ -43,21 +41,42 @@ in `./files/tomcat/bin`.
  -Dvaadin.portlet.static.resources.mapping=/o/vaadin-portlet-static/
 ````
 
-Run `docker-compose up`
+4. Download and add the Jna dependency JARs of a certain version into 
+   `/var/liferay/tomcat-<version>/webapps/ROOT/WEB-INF/lib`:
+   - [net.java.dev.jna:jna:5.7.0](https://mvnrepository.com/artifact/net.java.dev.jna/jna/5.7.0)
+   - [net.java.dev.jna:jna-platform:5.7.0](https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform/5.7.0)
+  
+   How to copy these files is described [here](https://learn.liferay.
+com/dxp/latest/en/installation-and-upgrades/installing-liferay/using-liferay
+-docker-images/providing-files-to-the-container.html#using-docker-cp)
+   
+   This is needed because Liferay uses an older version of Jna and running 
+Vaadin Portlet in dev mode causes a conflict of dependencies used by Liferay 
+and Vaadin License Checker (`NoClassDefFound` exception).
 
-Deploy all wars: `addressbook-grid/target/address-book-grid.war`, 
+   Here is a useful [docs](https://learn.liferay.
+ com/dxp/latest/en/building-applications/reference/jars-excluded-from-wabs.
+   html) describing how to add third-party dependency version you want.
+     
+5. Run `docker-compose up`
+
+6. Deploy all wars: `addressbook-grid/target/address-book-grid.war`, 
 `addressbook-form/target/address-book-form.war` and `addressbook-bundle/target/vaadin-portlet-static.war`, 
 to your docker container by copying them to `./deploy/` (the copied files should disappear when deployed).
 
-Wait for the bundles to start, then visit http://localhost:8080/, log in as `test@liferay.com` with
+7. Wait for the bundles to start, then visit http://localhost:8080/, log in as 
+`test@liferay.com` with
 password `test`.
 
-The deployed portlet needs to be added to a portal page. Do this by
-1) Selecting the Plus or the Pen icon near top right of the page (exact placement and look
+8. The deployed portlet needs to be added to a portal page. Do this by
+- Selecting the Plus or the Pen icon near top right of the page (exact 
+  placement and look
 varies by Liferay version) add elements to the current page.
-2) Under Widgets on the right sidebar find Vaadin Sample category under which you will find
+- Under Widgets on the right sidebar find Vaadin Sample category under which 
+  you will find
 entries for Contact List and Contact Form, drag and drop them onto the page.
-3) If at the top right of the page, in edit mode, you see a Publish button, use it to make your
+- If at the top right of the page, in edit mode, you see a Publish button, 
+  use it to make your
 changes public (7.3+).
 
 ## Remote debugging for Liferay
