@@ -24,8 +24,8 @@ import com.vaadin.flow.portal.VaadinLiferayPortlet;
  * @author Vaadin Ltd
  */
 @PortletConfiguration(
-    portletName = "ContactForm",
+    portletName = "LiferayRenderPortlet",
     dependencies = @Dependency(name = "PortletHub", scope = "javax.portlet", version = "3.0.0")
 )
-public class ContactFormPortlet extends VaadinLiferayPortlet<ContactFormView> {
+public class LiferayRenderPortlet extends VaadinLiferayPortlet<LiferayRenderView> {
 }

@@ -19,7 +19,7 @@
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <javax.validation.version>2.0.0.Final</javax.validation.version>
 
-        <vaadin.version>14.8.1</vaadin.version>
+        <vaadin.version>14.8.6</vaadin.version>
         <vaadin-portlet.version>1.0.0.beta4</vaadin-portlet.version>
         <vaadin.productionMode>true</vaadin.productionMode>
 
@@ -27,14 +27,7 @@
     </properties>
 
     <modules>
-        <!-- Backend first as both portlets use it -->
-        <module>addressbook-backend</module>
-
-        <!-- Portlets can be built in any order as they do not have -->
-        <!-- a dependency between them -->
-        <module>addressbook-grid</module>
         <module>addressbook-form</module>
-
         <!-- Depends on portlets, so build as last -->
         <module>addressbook-bundle</module>
     </modules>
@@ -121,6 +114,16 @@
                 <groupId>com.vaadin</groupId>
                 <artifactId>vaadin-portlet</artifactId>
                 <version>${vaadin-portlet.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.vaadin</groupId>
+                        <artifactId>flow-server</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.vaadin</groupId>
+                        <artifactId>flow-push</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -131,38 +134,6 @@
     <build>
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>org.codehaus.cargo</groupId>
-                    <artifactId>cargo-maven2-plugin</artifactId>
-                    <version>1.7.7</version>
-                    <configuration>
-                        <container>
-                            <containerId>tomcat8x</containerId>
-                            <zipUrlInstaller>
-                                <url>https://repo.maven.apache.org/maven2/org/apache/tomcat/tomcat/8.5.50/tomcat-8.5.50.zip</url>
-                            </zipUrlInstaller>
-                        </container>
-                        <configuration>
-                            <type>existing</type>
-                            <home>
-                                ${project.build.directory}/pluto-${pluto.version}
-                            </home>
-
-                            <properties>
-                                <cargo.start.jvmargs>
-                                    -Xdebug
-                                    -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
-                                    -Xnoagent
-                                    -Djava.compiler=NONE
-                                </cargo.start.jvmargs>
-                            </properties>
-                        </configuration>
-                        <!-- Set an empty deployer so that cargo does not try to add the
-                        current project's artifact to the container (as this was already
-                        done by maven) -->
-                        <deployer/>
-                    </configuration>
-                </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
