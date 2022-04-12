@@ -1,9 +1,9 @@
 # Address Book Portlet Demo  
-An example project to showcase how Vaadin portlet support works in a portal based on the Java Portlet API 3.0. 
+An example project to showcase how Vaadin 14 portlet support works in a portal based on the Java Portlet API 3.0. 
 Clone the repository and import the project to the IDE of your choice as a Maven project. 
 You need to have Java 8 or 11 installed.
 
-The documentation for Vaadin Portlet support is available [here](https://github.com/vaadin/flow-and-components-documentation/blob/master/documentation/portlet-support/overview.asciidoc).
+The documentation for Vaadin Portlet support is available [here](https://vaadin.com/docs/v14/flow/integrations/portlet).
 
 ## Running the portlet
 
@@ -73,8 +73,3 @@ Add the module sources to the bundle module `build-helper-maven-plugin` as added
 ````
 
 Then build the whole project again with `mvn install`
-
-## Notes about the project
-
-Vaadin 14+ portlet support feature is still under development and changes to
-both the API and this project are possible.
