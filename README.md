@@ -1,9 +1,9 @@
-# Address Book Portlet Demo  
-An example project to showcase how Vaadin portlet support works in a portal based on the Java Portlet API 3.0. 
+# Address Book Portlet Demo for Liferay 7
+An example project to showcase how Vaadin 14 portlet support works in a Liferay 7 container. 
 Clone the repository and import the project to the IDE of your choice as a Maven project. 
 You need to have Java 8 or 11 installed.
 
-The documentation for Vaadin Portlet support is available [here](https://github.com/vaadin/flow-and-components-documentation/blob/master/documentation/portlet-support/overview.asciidoc).
+The documentation for Vaadin Portlet support is available [here](https://vaadin.com/docs/v14/flow/integrations/portlet).
 
 ## Running the portlet under Liferay
 
@@ -64,9 +64,9 @@ and Vaadin License Checker (`NoClassDefFound` exception).
 `addressbook-form/target/address-book-form.war` and `addressbook-bundle/target/vaadin-portlet-static.war`, 
 to your docker container by copying them to `./deploy/` (the copied files should disappear when deployed).
 
-7. Wait for the bundles to start, then visit http://localhost:8080/, log in as 
-`test@liferay.com` with
-password `test`.
+7. Wait for the bundles to start, then visit http://localhost:8080/.
+   Set up a new user if you're running Liferay for the first time. Default is `test@liferay.com`/`test`.
+   Log in into Liferay.
 
 8. The deployed portlet needs to be added to a portal page. Do this by
 - Selecting the Plus or the Pen icon near top right of the page (exact 
@@ -126,24 +126,6 @@ Add the module sources to the bundle module `build-helper-maven-plugin` as added
 
 Then build the whole project again with `mvn install`
 
-## Notes about the project
-
-Vaadin 14+ portlet support feature is still under development and changes to
-both the API and this project are possible.
-
 ### Current known issues running under Liferay
 
-* The frontend UI may *sometimes* not render correctly when a
-Vaadin portlet is first added to a page or when the page is being edited. Reloading or
-publishing the page will resolve the issue (depending on exact Liferay version).
-* When impersonating users in Liferay 7.2 the portlets consistently
-render as blank (empty `vaadin-vertical-layout` web component in DOM).
-* Liferay partial page updates cause Vaadin portlets to render blank, if the browser has stale Vaadin client
-side data (i.e. the previous page also had a vaadin portlet) in its js globals.
-  * This issue can currently be avoided if `javascript.single.page.application.enabled=false` is set portal wide
-* Benign exception about not being able to detect websocket support during deployment of .war files from 
-Atmosphere (ServerContainer is null), Vaadin features reliant on WebSockets may not work.
-
-The portlets rendering with an empty layout is a common symptom of any problem with loading the portlet 
-frontend UI that happens after Liferay has commited the portlet response, often with not necessarily any
-visible errors logged on browser or serverside.
+See Vaadin Portlet [release notes](https://github.com/vaadin/portlet/releases) for a limitation and known issues list.
