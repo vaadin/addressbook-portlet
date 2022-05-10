@@ -1,9 +1,9 @@
 # Address Book Portlet Demo for Liferay 7
-An example project to showcase how Vaadin 14 portlet support works in a Liferay 7 container. 
+An example project to showcase how Vaadin 23.1+ portlet support works in a Liferay 7 container. 
 Clone the repository and import the project to the IDE of your choice as a Maven project. 
-You need to have Java 8 or 11 installed.
+You need to have Java 11 installed.
 
-The documentation for Vaadin Portlet support is available [here](https://vaadin.com/docs/v14/flow/integrations/portlet).
+The documentation for Vaadin Portlet support is available [here](https://vaadin.com/docs/latest/flow/integrations/portlet).
 
 ## Running the portlet under Liferay
 
@@ -42,9 +42,9 @@ in `./files/tomcat/bin`.
 ````
 
 4. Download and add the Jna dependency JARs of a certain version into 
-   `/var/liferay/tomcat-<version>/webapps/ROOT/WEB-INF/lib`:
-   - [net.java.dev.jna:jna:5.7.0](https://mvnrepository.com/artifact/net.java.dev.jna/jna/5.7.0)
-   - [net.java.dev.jna:jna-platform:5.7.0](https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform/5.7.0)
+   `/var/liferay/tomcat-<version>/webapps/ROOT/WEB-INF/lib/` (or `shielded-container-lib/`):
+   - [net.java.dev.jna:jna:5.11.0](https://mvnrepository.com/artifact/net.java.dev.jna/jna/5.11.0)
+   - [net.java.dev.jna:jna-platform:5.11.0](https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform/5.11.0)
   
    How to copy these files is described [here](https://learn.liferay.
 com/dxp/latest/en/installation-and-upgrades/installing-liferay/using-liferay

@@ -67,7 +67,6 @@
         <plugins>
             <plugin>
                 <groupId>com.vaadin</groupId>
-                <!-- Using Flow plugin instead of Vaadin plugin due to lacking prerelease of Vaadin 14.2 -->
                 <artifactId>vaadin-maven-plugin</artifactId>
                 <version>${vaadin.version}</version>
                 <executions>
@@ -78,7 +77,6 @@
                         </goals>
                         <configuration>
                             <productionMode>true</productionMode>
-                            <compatibilityMode>false</compatibilityMode>
                             <optimizeBundle>false</optimizeBundle>
                         </configuration>
                     </execution>

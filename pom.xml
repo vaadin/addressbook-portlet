@@ -11,16 +11,15 @@
     <packaging>pom</packaging>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8
         </project.reporting.outputEncoding>
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <javax.validation.version>2.0.0.Final</javax.validation.version>
 
-        <vaadin.version>14.8.8</vaadin.version>
-        <vaadin-portlet.version>1.0.0</vaadin-portlet.version>
+        <vaadin.version>23.1.0.beta1</vaadin.version>
         <vaadin.productionMode>true</vaadin.productionMode>
 
         <pluto.version>3.1.0</pluto.version>
@@ -83,44 +82,6 @@
                 <version>${vaadin.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <!-- Replace artifactId with vaadin-core to use only free components -->
-                <artifactId>vaadin</artifactId>
-                <version>${vaadin.version}</version>
-                <exclusions>
-                    <!-- Webjars are only needed when running in Vaadin 13 compatibility mode -->
-                    <exclusion>
-                        <groupId>com.vaadin.webjar</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.webjars.bowergithub.insites</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.webjars.bowergithub.polymer</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.webjars.bowergithub.polymerelements</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.webjars.bowergithub.vaadin</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.webjars.bowergithub.webcomponents</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>vaadin-portlet</artifactId>
-                <version>${vaadin-portlet.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
