@@ -1,54 +1,106 @@
-# Address Book Portlet Demo  
-An example project to showcase how Vaadin 14 portlet support works in a portal based on the Java Portlet API 3.0. 
+# Address Book Portlet Demo for Liferay 7
+An example project to showcase how Vaadin 23.1+ portlet support works in a Liferay 7 container. 
 Clone the repository and import the project to the IDE of your choice as a Maven project. 
-You need to have Java 8 or 11 installed.
+You need to have Java 11 installed.
 
-The documentation for Vaadin Portlet support is available [here](https://vaadin.com/docs/v14/flow/integrations/portlet).
+The documentation for Vaadin Portlet support is available [here](https://vaadin.com/docs/latest/flow/integrations/portlet).
 
-## Running the portlet
+## Running the portlet under Liferay
 
-Before the portlet application can be run, it must be deployed to a portal. 
-We currently support [Apache Pluto](https://portals.apache.org/pluto/). The
-easiest way to try out your application is to run a Maven goal which downloads 
-and starts an embedded Tomcat 8 serving the Pluto Portal driver:
+Before the portlet application can be run, it must be deployed to a portal for this
+branch the portal supported is [Liferay](https://www.liferay.com/downloads-community):
 
-First build the whole project using `mvn install` in the root
+1. Build the whole project using `mvn install` in the root
 
-then in the module `portal` execute
-`mvn package cargo:run -Pautosetup`
+2. We assume Liferay is running in http://localhost:8080/, an easy way to run a local
+copy of Liferay is to use their official [docker images](https://hub.docker.com/r/liferay/portal). 
+Below is an example of a docker-compose file you can use (note the used Liferay version, 7.2+ should
+work).
 
-Visit http://localhost:8080/pluto, and log in as `pluto`, password `pluto`.
+````
+version: "2.2"
+services:
+    liferay-dev:
+        image: liferay/portal:7.2.1-ga2
+        environment:
+            - LIFERAY_JAVASCRIPT_PERIOD_SINGLE_PERIOD_PAGE_PERIOD_APPLICATION_PERIOD_ENABLED=false
+        ports:
+            - 8080:8080
+            - 8000:8000
+        volumes:
+            - ./deploy:/mnt/liferay/deploy
+            - ./files:/mnt/liferay/files
+````
 
-The deployed portlet needs to be added to a portal page. Do this by
-1) Selecting `Pluto Admin` page
-2) Select `About Apache Pluto` from the drop-down under "Portal Pages"
-3) Select `/address-book-grid` from the left drop-down under "Portlet Applications"
-4) Select `Grid` from the drop-down on the right
-5) Click the `Add Portlet` button
-6) Select `About Apache Pluto` from the drop-down under "Portal Pages"
-7) Select `/address-book-form` from the left drop-down under "Portlet Applications"
-8) Select `Form` from the drop-down on the right
-9) Click the `Add Portlet` button
+3. Add the following to the end of the last line in Tomcat's `setenv.sh`
+(`/var/liferay/tomcat-<version>/bin`) before starting Liferay. When
+using the above docker-compose file place an edited copy of `setenv.sh`
+in `./files/tomcat/bin`.
 
-Once you navigate to `About Apache Pluto` page, the `Grid` and the `Form` portlets should be
-visible on the page.
+````
+ -Dvaadin.portlet.static.resources.mapping=/o/vaadin-portlet-static/
+````
 
-For the consecutive runs after installing, use the following command to reuse the already downloaded Tomcat and Pluto:
+4. Download and add the Jna dependency JARs of a certain version into 
+   `/var/liferay/tomcat-<version>/webapps/ROOT/WEB-INF/lib/` (or `shielded-container-lib/`):
+   - [net.java.dev.jna:jna:5.11.0](https://mvnrepository.com/artifact/net.java.dev.jna/jna/5.11.0)
+   - [net.java.dev.jna:jna-platform:5.11.0](https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform/5.11.0)
+  
+   How to copy these files is described [here](https://learn.liferay.
+com/dxp/latest/en/installation-and-upgrades/installing-liferay/using-liferay
+-docker-images/providing-files-to-the-container.html#using-docker-cp)
+   
+   This is needed because Liferay uses an older version of Jna and running 
+Vaadin Portlet in dev mode causes a conflict of dependencies used by Liferay 
+and Vaadin License Checker (`NoClassDefFound` exception).
 
-`mvn package cargo:run -Pautocopy`
+   Here is a useful [docs](https://learn.liferay.
+ com/dxp/latest/en/building-applications/reference/jars-excluded-from-wabs.
+   html) describing how to add third-party dependency version you want.
+     
+5. Run `docker-compose up`
 
-## Remote debugging for Portal
+6. Deploy all wars: `addressbook-grid/target/address-book-grid.war`, 
+`addressbook-form/target/address-book-form.war` and `addressbook-bundle/target/vaadin-portlet-static.war`, 
+to your docker container by copying them to `./deploy/` (the copied files should disappear when deployed).
 
-Remote debugging (JDWP) is available on port 8000 (to activate
+7. Wait for the bundles to start, then visit http://localhost:8080/.
+   Set up a new user if you're running Liferay for the first time. Default is `test@liferay.com`/`test`.
+   Log in into Liferay.
+
+8. The deployed portlet needs to be added to a portal page. Do this by
+- Selecting the Plus or the Pen icon near top right of the page (exact 
+  placement and look
+varies by Liferay version) add elements to the current page.
+- Under Widgets on the right sidebar find Vaadin Sample category under which 
+  you will find
+entries for Contact List and Contact Form, drag and drop them onto the page.
+- If at the top right of the page, in edit mode, you see a Publish button, 
+  use it to make your
+changes public (7.3+).
+
+## Remote debugging for Liferay
+
+In order to remote debug your portlet under Liferay add the following to the end of the last line in 
+Tomcat's `setenv.sh` (`/var/liferay/tomcat-<version>/bin`) before starting Liferay. When using the
+above docker-compose file place an edited copy of `setenv.sh` in `./files/tomcat/bin` before
+`docker-compose up`.
+
+````
+ -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000
+````
+
+Remote debugging (JDWP) is now available on port 8000 (to activate
 in IntelliJ, choose `Run -> Attach to Process...`). 
 
 ## Production build
+
 To build the production .war run:
 
 `mvn package -Pproduction`
 
-Deploy all wars `addressbook-grid/target/address-book-grid.war`, `addressbook-form/target/address-book-form.war`
-and `addressbook-bundle/target/vaadin-portlet-static.war` folder to your web server / portal. 
+Deploy all wars: `addressbook-grid/target/address-book-grid.war`, `addressbook-form/target/address-book-form.war`
+and `addressbook-bundle/target/vaadin-portlet-static.war`, to your web server / portal. 
 
 ## Adding a new Portlet module
 
@@ -59,7 +111,7 @@ Add to the new module the resource file `flow-build-info.json` into `./src/main/
 with the contents:
 ````json
 {
-  "externalStatsUrl": "/vaadin-portlet-static/VAADIN/config/stats.json"
+  "externalStatsUrl": "/o/vaadin-portlet-static/VAADIN/config/stats.json"
 }
 ````
 
@@ -73,3 +125,7 @@ Add the module sources to the bundle module `build-helper-maven-plugin` as added
 ````
 
 Then build the whole project again with `mvn install`
+
+### Current known issues running under Liferay
+
+See Vaadin Portlet [release notes](https://github.com/vaadin/portlet/releases) for a limitation and known issues list.

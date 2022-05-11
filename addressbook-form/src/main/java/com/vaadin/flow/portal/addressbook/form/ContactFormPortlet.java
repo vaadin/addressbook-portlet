@@ -15,10 +15,17 @@
  */
 package com.vaadin.flow.portal.addressbook.form;
 
-import com.vaadin.flow.portal.VaadinPortlet;
+import javax.portlet.annotations.Dependency;
+import javax.portlet.annotations.PortletConfiguration;
+
+import com.vaadin.flow.portal.VaadinLiferayPortlet;
 
 /**
  * @author Vaadin Ltd
  */
-public class ContactFormPortlet extends VaadinPortlet<ContactFormView> {
+@PortletConfiguration(
+    portletName = "ContactForm",
+    dependencies = @Dependency(name = "PortletHub", scope = "javax.portlet", version = "3.0.0")
+)
+public class ContactFormPortlet extends VaadinLiferayPortlet<ContactFormView> {
 }
