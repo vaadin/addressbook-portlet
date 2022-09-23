@@ -27,14 +27,7 @@
     </properties>
 
     <modules>
-        <!-- Backend first as both portlets use it -->
-        <module>addressbook-backend</module>
-
-        <!-- Portlets can be built in any order as they do not have -->
-        <!-- a dependency between them -->
-        <module>addressbook-grid</module>
         <module>addressbook-form</module>
-
         <!-- Depends on portlets, so build as last -->
         <module>addressbook-bundle</module>
     </modules>

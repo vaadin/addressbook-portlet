@@ -23,12 +23,6 @@
 
         <dependency>
             <groupId>com.vaadin</groupId>
-            <artifactId>address-book-backend</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.vaadin</groupId>
             <artifactId>vaadin-portlet</artifactId>
         </dependency>
 

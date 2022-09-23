@@ -46,8 +46,6 @@
                                              usetimestamp="true"/>
                                         <unzip src="${project.build.directory}/pluto.zip"
                                                dest="${project.build.directory}"/>
-                                        <copy file="../addressbook-grid/target/address-book-grid.war"
-                                              todir="${project.build.directory}/pluto-${pluto.version}/webapps"/>
                                         <copy file="../addressbook-form/target/address-book-form.war"
                                               todir="${project.build.directory}/pluto-${pluto.version}/webapps"/>
                                         <copy file="../addressbook-bundle/target/vaadin-portlet-static.war"
@@ -83,8 +81,6 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <copy file="../addressbook-grid/target/address-book-grid.war"
-                                              todir="${project.build.directory}/pluto-${pluto.version}/webapps"/>
                                         <copy file="../addressbook-form/target/address-book-form.war"
                                               todir="${project.build.directory}/pluto-${pluto.version}/webapps"/>
                                         <copy file="../addressbook-bundle/target/vaadin-portlet-static.war"
