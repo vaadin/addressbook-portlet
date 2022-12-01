@@ -1,5 +1,5 @@
 # Address Book Portlet Demo for Liferay 7
-An example project to showcase how Vaadin 23.1+ portlet support works in a Liferay 7 container. 
+An example project to showcase how Vaadin 23.2+ portlet support works in a Liferay 7 container. 
 Clone the repository and import the project to the IDE of your choice as a Maven project. 
 You need to have Java 11 installed.
 
