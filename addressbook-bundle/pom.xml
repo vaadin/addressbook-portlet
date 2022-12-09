@@ -40,6 +40,7 @@
             <scope>provided</scope>
         </dependency>
 
+        <!--
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>address-book-grid</artifactId>
@@ -53,6 +54,20 @@
             <version>${project.version}</version>
             <classifier>classes</classifier>
         </dependency>
+        -->
+
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>address-book-grid-jar</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>address-book-form-jar</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -92,7 +107,7 @@
                     <webResources>
                         <resource>
                             <!-- this is relative to the pom.xml directory -->
-                            <directory>target/classes/META-INF/</directory>
+                            <directory>target/classes/META-INF/VAADIN/webapp/</directory>
                             <!-- Include all files and folders below <directory> -->
                             <includes>
                                 <include>**</include>
@@ -103,8 +118,39 @@
                                 </exclude>
                             </excludes>
                         </resource>
+                        <resource>
+                            <!-- this is relative to the pom.xml directory -->
+                            <directory>target/classes/META-INF/</directory>
+                            <!-- Include all files and folders below <directory> -->
+                            <includes>
+                                <include>VAADIN/config/**</include>
+                            </includes>
+                            <!-- do not include flow-build-info -->
+                            <excludes>
+                                <exclude>VAADIN/config/flow-build-info.json
+                                </exclude>
+                            </excludes>
+                        </resource>
                     </webResources>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>shared-static-resource</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>META-INF/VAADIN/webapp/*.html*</include>
+                            </includes>
+                            <classifier>resources</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

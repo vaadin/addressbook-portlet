@@ -26,6 +26,12 @@
             <artifactId>address-book-backend</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>address-book-static-bundle</artifactId>
+            <version>${project.version}</version>
+            <classifier>resources</classifier>
+        </dependency>
 
         <dependency>
             <groupId>com.vaadin</groupId>
