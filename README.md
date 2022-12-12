@@ -60,8 +60,8 @@ and Vaadin License Checker (`NoClassDefFound` exception).
      
 5. Run `docker-compose up`
 
-6. Deploy all wars: `addressbook-grid/target/address-book-grid.war`, 
-`addressbook-form/target/address-book-form.war` and `addressbook-bundle/target/vaadin-portlet-static.war`, 
+6. Deploy all wars: `addressbook-bundle/target/vaadin-portlet-static.war`, `addressbook-grid/target/address-book-grid.war` and 
+`addressbook-form/target/address-book-form.war` 
 to your docker container by copying them to `./deploy/` (the copied files should disappear when deployed).
 
 7. Wait for the bundles to start, then visit http://localhost:8080/.

@@ -87,15 +87,29 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <!-- static files should contain vaadin-portlet, flow-client and all build files generated in VAADIN/ -->
-                    <packagingIncludes>WEB-INF/classes/**/*.class,WEB-INF/*.xml,WEB-INF/lib/flow-client*.jar,WEB-INF/lib/vaadin-portlet*.jar,VAADIN/
+                    <packagingIncludes>
+                        WEB-INF/classes/**/*.class,WEB-INF/*.xml,WEB-INF/lib/flow-client*.jar,WEB-INF/lib/vaadin-portlet*.jar,VAADIN/
                     </packagingIncludes>
                     <webResources>
+                        <resource>
+                            <!-- this is relative to the pom.xml directory -->
+                            <directory>target/classes/META-INF/VAADIN/webapp/</directory>
+                            <!-- Include all files and folders below <directory> -->
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                            <!-- do not include flow-build-info -->
+                            <excludes>
+                                <exclude>VAADIN/config/flow-build-info.json
+                                </exclude>
+                            </excludes>
+                        </resource>
                         <resource>
                             <!-- this is relative to the pom.xml directory -->
                             <directory>target/classes/META-INF/</directory>
                             <!-- Include all files and folders below <directory> -->
                             <includes>
-                                <include>**</include>
+                                <include>VAADIN/config/**</include>
                             </includes>
                             <!-- do not include flow-build-info -->
                             <excludes>
