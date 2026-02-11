@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.portlet.WindowState;
+import jakarta.portlet.WindowState;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;

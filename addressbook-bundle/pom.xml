@@ -18,13 +18,23 @@
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>copilot</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-dev-server</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
-        <!-- Portlet API -->
+        <!-- Jakarta Portlet API 4.0 (provided by Liferay) -->
         <dependency>
-            <groupId>javax.portlet</groupId>
-            <artifactId>portlet-api</artifactId>
-            <version>3.0.0</version>
+            <groupId>com.liferay.jakarta.portlet</groupId>
+            <artifactId>com.liferay.jakarta.portlet-api</artifactId>
+            <version>4.0.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -53,10 +63,11 @@
             <version>${project.version}</version>
             <classifier>classes</classifier>
         </dependency>
+        <!-- Jakarta Servlet API 6.0 (provided by Tomcat 10.1) -->
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -87,21 +98,22 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <!-- static files should contain vaadin-portlet, flow-client and all build files generated in VAADIN/ -->
-                    <packagingIncludes>WEB-INF/classes/**/*.class,WEB-INF/*.xml,WEB-INF/lib/flow-client*.jar,WEB-INF/lib/vaadin-portlet*.jar,VAADIN/
+                    <packagingIncludes>WEB-INF/classes/**/*.class,WEB-INF/*.xml,WEB-INF/lib/flow-client*.jar,WEB-INF/lib/vaadin-portlet*.jar,VAADIN/,web-component.html,index.html
                     </packagingIncludes>
                     <webResources>
                         <resource>
                             <!-- this is relative to the pom.xml directory -->
-                            <directory>target/classes/META-INF/</directory>
+                            <directory>target/classes/META-INF/VAADIN/webapp</directory>
                             <!-- Include all files and folders below <directory> -->
                             <includes>
                                 <include>**</include>
                             </includes>
-                            <!-- do not include flow-build-info -->
-                            <excludes>
-                                <exclude>VAADIN/config/flow-build-info.json
-                                </exclude>
-                            </excludes>
+                        </resource>
+                        <resource>
+                            <directory>target/classes/META-INF</directory>
+                            <includes>
+                                <include>VAADIN/config/stats.json</include>
+                            </includes>
                         </resource>
                     </webResources>
                 </configuration>

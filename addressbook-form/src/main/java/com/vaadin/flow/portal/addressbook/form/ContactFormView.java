@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.portlet.PortletMode;
+import jakarta.portlet.PortletMode;
 
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
