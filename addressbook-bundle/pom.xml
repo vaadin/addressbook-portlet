@@ -63,6 +63,13 @@
             <version>${project.version}</version>
             <classifier>classes</classifier>
         </dependency>
+
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>address-book-upload</artifactId>
+            <version>${project.version}</version>
+            <classifier>classes</classifier>
+        </dependency>
         <!-- Jakarta Servlet API 6.0 (provided by Tomcat 10.1) -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
