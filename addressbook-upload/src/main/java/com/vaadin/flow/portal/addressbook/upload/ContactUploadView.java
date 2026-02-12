@@ -19,6 +19,10 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Collections;
 
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -29,10 +33,6 @@ import com.vaadin.flow.portal.PortletViewContext;
 import com.vaadin.flow.portal.addressbook.backend.Contact;
 import com.vaadin.flow.portal.addressbook.backend.ContactService;
 import com.vaadin.flow.portal.addressbook.backend.PortletEventConstants;
-
-import elemental.json.Json;
-import elemental.json.JsonArray;
-import elemental.json.JsonObject;
 
 public class ContactUploadView extends VerticalLayout implements PortletView {
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(ContactUploadView.class);
@@ -66,31 +66,28 @@ public class ContactUploadView extends VerticalLayout implements PortletView {
             try {
                 String json = new String(
                         buffer.getInputStream().readAllBytes(),
-                        StandardCharsets.UTF_8).trim();
+                        StandardCharsets.UTF_8);
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode root = mapper.readTree(json);
 
-                // Json.parse() returns JsonObject and throws
-                // ClassCastException on top-level arrays, so
-                // detect arrays and wrap them for parsing.
-                JsonArray contacts;
-                if (json.startsWith("[")) {
-                    contacts = Json.parse("{\"items\":" + json + "}")
-                            .getArray("items");
+                ArrayNode contacts;
+                if (root.isArray()) {
+                    contacts = (ArrayNode) root;
                 } else {
-                    contacts = Json.createArray();
-                    contacts.set(0, Json.parse(json));
+                    contacts = mapper.createArrayNode();
+                    contacts.add(root);
                 }
 
                 int count = 0;
-                for (int i = 0; i < contacts.length(); i++) {
-                    JsonObject obj = contacts.getObject(i);
+                for (JsonNode obj : contacts) {
                     Contact c = new Contact(getService().getNextId());
-                    c.setFirstName(obj.getString("firstName"));
-                    c.setLastName(obj.getString("lastName"));
-                    c.setPhoneNumber(obj.getString("phoneNumber"));
-                    c.setEmail(obj.getString("email"));
-                    c.setBirthDate(LocalDate.parse(obj.getString("birthDate")));
-                    if (obj.hasKey("image")) {
-                        c.setImage(obj.getString("image"));
+                    c.setFirstName(obj.get("firstName").asText());
+                    c.setLastName(obj.get("lastName").asText());
+                    c.setPhoneNumber(obj.get("phoneNumber").asText());
+                    c.setEmail(obj.get("email").asText());
+                    c.setBirthDate(LocalDate.parse(obj.get("birthDate").asText()));
+                    if (obj.has("image")) {
+                        c.setImage(obj.get("image").asText());
                     }
                     getService().create(c);
                     count++;
