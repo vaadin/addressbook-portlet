@@ -39,8 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vaadin.flow.data.provider.Query;
 
-import elemental.json.JsonArray;
-import elemental.json.JsonObject;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Service for getting and storing contacts to a SQL DataBase.
@@ -68,27 +67,26 @@ public class ContactService {
 
             if (contacts == 0) {
                 UsersUtil.getRandomUsers(20, "contacts").ifPresent(result -> {
-                    JsonArray results = result.getArray("results");
-                    for (int i = 0; i < results.length(); i++) {
+                    JsonNode results = result.get("results");
+                    for (int i = 0; i < results.size(); i++) {
                         Contact contact = new Contact(i + 1);
-                        JsonObject json = results.getObject(i);
+                        JsonNode json = results.get(i);
                         contact.setFirstName(
-                                json.getObject("name").getString("first"));
+                                json.get("name").get("first").asText());
                         contact.setLastName(
-                                json.getObject("name").getString("last"));
+                                json.get("name").get("last").asText());
                         contact.setBirthDate(LocalDateTime
                                 .ofInstant(
-                                        Instant.parse(json.getObject("dob")
-                                                .getString("date")),
+                                        Instant.parse(json.get("dob")
+                                                .get("date").asText()),
                                         ZoneId.of(ZoneOffset.UTC.getId()))
                                 .toLocalDate());
-                        contact.setEmail(json.getString("email"));
-                        contact.setPhoneNumber(json.getString("phone"));
+                        contact.setEmail(json.get("email").asText());
+                        contact.setPhoneNumber(json.get("phone").asText());
                         contact.setImage(
-                                json.getObject("picture").getString("medium"));
+                                json.get("picture").get("medium").asText());
                         create(contact);
                     }
-
                 });
             }
         }

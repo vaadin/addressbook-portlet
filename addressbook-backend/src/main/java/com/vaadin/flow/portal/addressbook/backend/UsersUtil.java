@@ -7,13 +7,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Optional;
 
-import elemental.json.Json;
-import elemental.json.JsonObject;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Utility class for getting random user data.
  */
 public final class UsersUtil {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private UsersUtil() {
     }
@@ -56,9 +58,9 @@ public final class UsersUtil {
      *         number of users to get
      * @param seed
      *         seed string to use
-     * @return optional JsonObject containing user data if successful
+     * @return optional JsonNode containing user data if successful
      */
-    public static Optional<JsonObject> getRandomUsers(int num, String seed) {
+    public static Optional<JsonNode> getRandomUsers(int num, String seed) {
         String url = "https://randomuser.me/api/?results=" + num
                 + "&exc=login,location&noinfo&seed=" + seed;
         HttpURLConnection con = null;
@@ -83,7 +85,7 @@ public final class UsersUtil {
                     response.append(inputLine);
                 }
             }
-            return Optional.of(Json.parse(response.toString()));
+            return Optional.of(MAPPER.readTree(response.toString()));
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -21,7 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
-import com.helger.commons.hashcode.HashCodeGenerator;
+import java.util.Objects;
 
 public class Contact implements Serializable {
 
@@ -114,8 +114,7 @@ public class Contact implements Serializable {
 
     @Override
     public int hashCode() {
-        return new HashCodeGenerator(Contact.class).append(id).append(firstName)
-                .append(lastName).append(phoneNumber).append(email)
-                .append(birthDate).getHashCode();
+        return Objects.hash(id, firstName, lastName, phoneNumber, email,
+                birthDate);
     }
 }

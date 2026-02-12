@@ -97,8 +97,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
-                    <!-- static files should contain vaadin-portlet, flow-client and all build files generated in VAADIN/ -->
-                    <packagingIncludes>WEB-INF/classes/**/*.class,WEB-INF/*.xml,WEB-INF/lib/flow-client*.jar,WEB-INF/lib/vaadin-portlet*.jar,VAADIN/,web-component.html,index.html
+                    <!-- static files should contain vaadin-portlet, flow-client, lumo theme and all build files generated in VAADIN/ -->
+                    <packagingIncludes>WEB-INF/classes/**/*.class,WEB-INF/*.xml,WEB-INF/lib/flow-client*.jar,WEB-INF/lib/vaadin-portlet*.jar,WEB-INF/lib/vaadin-lumo-theme*.jar,VAADIN/,web-component.html,index.html
                     </packagingIncludes>
                     <webResources>
                         <resource>

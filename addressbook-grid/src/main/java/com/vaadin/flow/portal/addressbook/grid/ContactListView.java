@@ -24,7 +24,10 @@ import jakarta.portlet.WindowState;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.ItemClickEvent;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.server.Version;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.portal.PortletView;
@@ -108,10 +111,14 @@ public class ContactListView extends VerticalLayout implements PortletView {
         windowStateButton = new Button();
         windowStateButton.addClickListener(event -> switchWindowState());
 
+        Button versionButton = new Button("Version", event ->
+                Notification.show("Vaadin Flow " + Version.getFullVersion()));
+
         handleWindowStateChanged(getWindowState());
 
-        add(windowStateButton, grid);
-        setHorizontalComponentAlignment(Alignment.END, windowStateButton);
+        HorizontalLayout toolbar = new HorizontalLayout(windowStateButton, versionButton);
+        add(toolbar, grid);
+        setHorizontalComponentAlignment(Alignment.END, toolbar);
     }
 
     private ContactService getService() {
