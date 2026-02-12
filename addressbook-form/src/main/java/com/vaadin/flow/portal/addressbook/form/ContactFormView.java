@@ -119,6 +119,7 @@ public class ContactFormView extends VerticalLayout implements PortletView {
 
         HorizontalLayout actionButtons = new HorizontalLayout(action, cancel,
                 remove);
+
         add(formLayout, actionButtons);
         setHorizontalComponentAlignment(Alignment.END, actionButtons);
     }
