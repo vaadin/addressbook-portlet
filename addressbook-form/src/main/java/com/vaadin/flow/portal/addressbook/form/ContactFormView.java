@@ -19,12 +19,12 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
+import com.vaadin.flow.component.dependency.CssImport;
 import jakarta.portlet.PortletMode;
 
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -43,6 +43,7 @@ import com.vaadin.flow.portal.lifecycle.PortletModeEvent;
 /**
  * @author Vaadin Ltd
  */
+@CssImport("@vaadin/vaadin-lumo-styles/lumo.css")
 public class ContactFormView extends VerticalLayout implements PortletView {
 
     private static final String ACTION_EDIT = "Edit";

@@ -81,13 +81,13 @@ public class ContactUploadView extends VerticalLayout implements PortletView {
                 int count = 0;
                 for (JsonNode obj : contacts) {
                     Contact c = new Contact(getService().getNextId());
-                    c.setFirstName(obj.get("firstName").asText());
-                    c.setLastName(obj.get("lastName").asText());
-                    c.setPhoneNumber(obj.get("phoneNumber").asText());
-                    c.setEmail(obj.get("email").asText());
-                    c.setBirthDate(LocalDate.parse(obj.get("birthDate").asText()));
+                    c.setFirstName(obj.get("firstName").asString());
+                    c.setLastName(obj.get("lastName").asString());
+                    c.setPhoneNumber(obj.get("phoneNumber").asString());
+                    c.setEmail(obj.get("email").asString());
+                    c.setBirthDate(LocalDate.parse(obj.get("birthDate").asString()));
                     if (obj.has("image")) {
-                        c.setImage(obj.get("image").asText());
+                        c.setImage(obj.get("image").asString());
                     }
                     getService().create(c);
                     count++;
