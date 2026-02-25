@@ -111,6 +111,32 @@ in `addressbook-bundle/pom.xml` so the Vaadin frontend build picks up the module
 
 Then build the whole project again with `mvn install`.
 
+## Disabling Liferay SPA (Single Page Application)
+
+Liferay's SPA navigation (powered by senna.js / `frontend-js-spa-web`) must be disabled
+on Liferay instances that host Vaadin portlets. Vaadin's frontend is built on ES modules,
+which only execute once per page lifecycle. After an SPA navigation, `FlowClient.init()`
+does not re-run, leaving stale clients that cannot serve new UIs — portlets appear blank.
+
+The recommended approach is to **exclude portlet pages from SPA** rather than disabling
+it globally. This keeps SPA enabled for non-portlet pages while forcing full page reloads
+only where needed:
+
+1. Log in as administrator
+2. Navigate to **Control Panel → Instance Settings → Infrastructure → Frontend SPA Infrastructure**
+3. Add portlet page paths to **Custom Excluded Paths** (regex), e.g. `/address-book.*`
+4. Save
+
+Alternatively, disable SPA globally via Instance Settings (uncheck **Enable SPA**) or
+set the portal property (requires server restart):
+
+````properties
+javascript.single.page.application.enabled=false
+````
+
+> **Note:** On Liferay 2025.Q4+ this property only sets the default for new instances.
+> Already-initialized instances must be configured through Instance Settings.
+
 ### Current known issues running under Liferay
 
 See Vaadin Portlet [release notes](https://github.com/vaadin/portlet/releases) for a limitation and known issues list.
