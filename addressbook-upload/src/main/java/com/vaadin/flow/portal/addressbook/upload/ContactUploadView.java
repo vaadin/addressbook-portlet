@@ -66,6 +66,8 @@ public class ContactUploadView extends VerticalLayout implements PortletView {
         InMemoryUploadHandler inMemoryHandler = UploadHandler.inMemory((metaData, data) -> {
             try {
                 String json = new String(data, StandardCharsets.UTF_8).trim();
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode root = mapper.readTree(json);
 
                 ArrayNode contacts;
                 if (root.isArray()) {

@@ -150,11 +150,11 @@ public class ContactFormView extends VerticalLayout implements PortletView {
         formLayout.addFormItem(birthDate, "Birth date");
 
         binder = new Binder<>(Contact.class);
-        binder.bind(firstName, "firstName");
-        binder.bind(lastName, "lastName");
-        binder.bind(email, "email");
-        binder.bind(phone, "phoneNumber");
-        binder.bind(birthDate, "birthDate");
+        binder.bind(firstName, Contact::getFirstName, Contact::setFirstName);
+        binder.bind(lastName, Contact::getLastName, Contact::setLastName);
+        binder.bind(email, Contact::getEmail, Contact::setEmail);
+        binder.bind(phone, Contact::getPhoneNumber, Contact::setPhoneNumber);
+        binder.bind(birthDate, Contact::getBirthDate, Contact::setBirthDate);
 
         // Set the state of form depending on portlet mode.
         binder.setReadOnly(PortletMode.VIEW.equals(getPortletMode()));

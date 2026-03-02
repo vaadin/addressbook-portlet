@@ -71,20 +71,17 @@ public class ContactService {
                     for (int i = 0; i < results.size(); i++) {
                         Contact contact = new Contact(i + 1);
                         JsonNode json = results.get(i);
-                        contact.setFirstName(
-                                json.get("name").get("first").asText());
-                        contact.setLastName(
-                                json.get("name").get("last").asText());
+                        contact.setFirstName(json.get("name").get("first").asString());
+                        contact.setLastName(json.get("name").get("last").asString());
                         contact.setBirthDate(LocalDateTime
                                 .ofInstant(
                                         Instant.parse(json.get("dob")
-                                                .get("date").asText()),
+                                                .get("date").asString()),
                                         ZoneId.of(ZoneOffset.UTC.getId()))
                                 .toLocalDate());
-                        contact.setEmail(json.get("email").asText());
-                        contact.setPhoneNumber(json.get("phone").asText());
-                        contact.setImage(
-                                json.get("picture").get("medium").asText());
+                        contact.setEmail(json.get("email").asString());
+                        contact.setPhoneNumber(json.get("phone").asString());
+                        contact.setImage(json.get("picture").get("medium").asString());
                         create(contact);
                     }
                 });

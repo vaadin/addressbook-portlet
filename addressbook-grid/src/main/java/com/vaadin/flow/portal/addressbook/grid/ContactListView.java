@@ -23,13 +23,13 @@ import jakarta.portlet.WindowState;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.ItemClickEvent;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.grid.dataview.GridLazyDataView;
 import com.vaadin.flow.server.Version;
-import com.vaadin.flow.data.provider.CallbackDataProvider;
-import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.portal.PortletView;
 import com.vaadin.flow.portal.PortletViewContext;
 import com.vaadin.flow.portal.addressbook.backend.Contact;
@@ -42,9 +42,11 @@ import com.vaadin.flow.portal.lifecycle.PortletEvent;
  */
 public class ContactListView extends VerticalLayout implements PortletView {
 
-    private DataProvider<Contact, Void> dataProvider;
+    private GridLazyDataView<Contact> dataView;
 
-    private Grid<Contact> grid = new Grid<>(Contact.class);
+    private Grid<Contact> grid = new Grid<>(Contact.class, false);
+    private Column<Contact> emailColumn;
+    private Column<Contact> birthDateColumn;
     private Button windowStateButton;
 
     private PortletViewContext portletViewContext;
@@ -66,21 +68,22 @@ public class ContactListView extends VerticalLayout implements PortletView {
         int contactId = Integer
                 .parseInt(event.getParameters().get(PortletEventConstants.KEY_CONTACT_ID)[0]);
         Optional<Contact> contact = getService().findById(contactId);
-        contact.ifPresent(value -> dataProvider.refreshItem(value));
+        contact.ifPresent(value -> dataView.refreshItem(value));
     }
 
     private void onContactsChanged(PortletEvent event) {
-        dataProvider.refreshAll();
-    } 
+        dataView.refreshAll();
+    }
 
     private void handleWindowStateChanged(WindowState windowState) {
         if (WindowState.MAXIMIZED.equals(windowState)) {
-            grid.setColumns("firstName", "lastName", "phoneNumber", "email",
-                    "birthDate");
+            emailColumn.setVisible(true);
+            birthDateColumn.setVisible(true);
             grid.setMinWidth("700px");
             this.windowStateButton.setText("Normalize");
         } else if (WindowState.NORMAL.equals(windowState)) {
-            grid.setColumns("firstName", "lastName", "phoneNumber");
+            emailColumn.setVisible(false);
+            birthDateColumn.setVisible(false);
             grid.setMinWidth("450px");
             this.windowStateButton.setText("Maximize");
         }
@@ -99,12 +102,16 @@ public class ContactListView extends VerticalLayout implements PortletView {
     private void init() {
         setWidthFull();
 
-        dataProvider = new CallbackDataProvider<Contact, Void>(
-                getService()::getContacts, getService()::getContactsCount,
-                Contact::getId);
+        grid.addColumn(Contact::getFirstName).setHeader("First name");
+        grid.addColumn(Contact::getLastName).setHeader("Last name");
+        grid.addColumn(Contact::getPhoneNumber).setHeader("Phone number");
+        emailColumn = grid.addColumn(Contact::getEmail).setHeader("Email");
+        birthDateColumn = grid.addColumn(Contact::getBirthDate).setHeader("Birth date");
 
-        grid.setDataProvider(dataProvider);
-        grid.removeColumnByKey("id");
+        dataView = grid.setItems(
+                query -> getService().getContacts(query),
+                query -> getService().getContactsCount(query));
+
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         grid.addItemClickListener(this::fireSelectionEvent);
 
