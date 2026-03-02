@@ -15,24 +15,24 @@
  */
 package com.vaadin.flow.portal.addressbook.upload;
 
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.util.Collections;
-
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.portal.PortletView;
 import com.vaadin.flow.portal.PortletViewContext;
 import com.vaadin.flow.portal.addressbook.backend.Contact;
 import com.vaadin.flow.portal.addressbook.backend.ContactService;
 import com.vaadin.flow.portal.addressbook.backend.PortletEventConstants;
-
+import com.vaadin.flow.server.streams.InMemoryUploadHandler;
+import com.vaadin.flow.server.streams.UploadHandler;
 import elemental.json.Json;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
+
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.Collections;
 
 public class ContactUploadView extends VerticalLayout implements PortletView {
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(ContactUploadView.class);
@@ -56,17 +56,14 @@ public class ContactUploadView extends VerticalLayout implements PortletView {
 
     private void fireListChangedEvent() {
         portletViewContext.fireEvent(PortletEventConstants.EVENT_CONTACT_LIST_CHANGED,
-            Collections.emptyMap());
+                Collections.emptyMap());
     }
 
     private Upload createJsonUpload() {
-        MemoryBuffer buffer = new MemoryBuffer();
-        Upload upload = new Upload(buffer);
-        upload.addSucceededListener(event -> {
+        Upload upload = new Upload();
+        InMemoryUploadHandler inMemoryHandler = UploadHandler.inMemory((metaData, data) -> {
             try {
-                String json = new String(
-                        buffer.getInputStream().readAllBytes(),
-                        StandardCharsets.UTF_8).trim();
+                String json = new String(data, StandardCharsets.UTF_8).trim();
 
                 // Json.parse() returns JsonObject and throws
                 // ClassCastException on top-level arrays, so
@@ -105,6 +102,8 @@ public class ContactUploadView extends VerticalLayout implements PortletView {
                         "Failed to import contacts: " + ex.getMessage());
             }
         });
+
+        upload.setUploadHandler(inMemoryHandler);
         upload.setAcceptedFileTypes(".json", "application/json");
         upload.setMaxFiles(1);
         upload.setDropLabel(new Span("Upload JSON contacts"));
